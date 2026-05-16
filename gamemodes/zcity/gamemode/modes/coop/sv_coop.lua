@@ -305,9 +305,9 @@ function MODE:GiveEquipment()
         local hasGordon = false
 
         local currentMap = game.GetMap()
-        local mapData = self.Maps[currentMap] or {PlayerEqipment = "rebel"} 
+        local mapData = self.Maps[currentMap] or {PlayerEqipment = "rebel"}
         local playerClass = mapData.PlayerEqipment
-        
+
         local maxMedics = math.max(1, math.min(3, math.floor(#players / 5)))
         local maxGrenadier = math.max(1, math.min(3, math.floor(#players / 5)))
 
