@@ -558,6 +558,7 @@ local function CanPossessNPC(ply, npc)
     if CurrentRound().name ~= "coop" then return false end
     if not coop_rts:GetBool() then return false end
     if (ply.RTSUses or 0) >= zb_coop_maxpossesses:GetInt() and not ply:IsAdmin() then return false end
+    if GetPossessCooldownRemaining(ply) > 0 then return false end
 
     local npcClass = npc:GetClass()
     if friendlyNPCClasses[npcClass] then return true end
