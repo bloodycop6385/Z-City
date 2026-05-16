@@ -254,14 +254,14 @@ end
 
 local function getspawnpos(i)
     local tab = {}
-    
+
     local coopSpawns = zb.GetMapPoints("HMCD_COOP_SPAWN") or {}
     for k, v in pairs(coopSpawns) do
         if v.pos then
             tab[#tab + 1] = v.pos
         end
     end
-    
+
     if #tab == 0 then
         local tbl = ents.FindByClass("info_player_start")
 
