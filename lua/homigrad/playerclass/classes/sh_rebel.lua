@@ -143,119 +143,96 @@ function CLASS.On(self, data)
         mdl_key = appearance.AModel
     end
 
-    self:SetPlayerColor(Color(13,101,5):ToVector())
+    self:SetPlayerColor(Color(13, 101, 5):ToVector())
     self:SetModel(rebel_models[mdl_key])
     self:SetSubMaterial()
     self:SetNetVar("Accessories", "")
-
-    if not data.bNoEquipment then
-        self:PlayerClassEvent("GiveEquipment", self.subClass)
-    end
-
-
+    if not data.bNoEquipment then self:PlayerClassEvent("GiveEquipment", self.subClass) end
     if self.subClass == "medic" then
         local new_mdl = rebel_medic_models[self:GetModel()]
-        if new_mdl then
-            self:SetModel(new_mdl)
-        end
+        if new_mdl then self:SetModel(new_mdl) end
     end
-
 
     self.subClass = nil
-
-    if zb and zb.GiveRole then
-        zb.GiveRole(self, "Rebel", Color(0, 173, 43))
-    end
-
-    self:SetBodygroup(10, 1)                  
-    self:SetBodygroup(8, math.random(0,15))   
-    self:SetBodygroup(9, math.random(0,9))    
-    self:SetSkin(math.random(0,3))            
-
-
+    if zb and zb.GiveRole then zb.GiveRole(self, "Rebel", Color(0, 173, 43)) end
+    self:SetBodygroup(10, 1)
+    self:SetBodygroup(8, math.random(0, 15))
+    self:SetBodygroup(9, math.random(0, 9))
+    self:SetSkin(math.random(0, 3))
     self.CurAppearance = appearance
-    
-    for k,v in ipairs(ents.FindByClass("npc_*")) do
-        if table.HasValue(rebels,v:GetClass()) then
-            v:AddEntityRelationship( self, D_LI, 0 )
+    for k, v in ipairs(ents.FindByClass("npc_*")) do
+        if table.HasValue(rebels, v:GetClass()) then
+            v:AddEntityRelationship(self, D_LI, 0)
             v:ClearEnemyMemory()
-        elseif table.HasValue(combines,v:GetClass()) then
-            v:AddEntityRelationship( self, D_HT, 99 )
+        elseif table.HasValue(combines, v:GetClass()) then
+            v:AddEntityRelationship(self, D_HT, 99)
             v:ClearEnemyMemory()
         end
     end
-    
+
     local index = self:EntIndex()
-    hook.Add( "OnEntityCreated", "rebel_relation_ship"..index, function( ent )
-        if not IsValid(self) then hook.Remove("OnEntityCreated","rebel_relation_ship"..index) return end
-        if ( ent:IsNPC() ) then
-            if table.HasValue(rebels,ent:GetClass()) then
-                ent:AddEntityRelationship( self, D_LI, 0 )
-            end
-
-            if table.HasValue(combines,ent:GetClass()) then
-                ent:AddEntityRelationship( self, D_HT, 99 )
-            end
+    hook.Add("OnEntityCreated", "rebel_relation_ship" .. index, function(ent)
+        if not IsValid(self) then
+            hook.Remove("OnEntityCreated", "rebel_relation_ship" .. index)
+            return
         end
-    end )
-end
 
+        if ent:IsNPC() then
+            if table.HasValue(rebels, ent:GetClass()) then ent:AddEntityRelationship(self, D_LI, 0) end
+            if table.HasValue(combines, ent:GetClass()) then ent:AddEntityRelationship(self, D_HT, 99) end
+        end
+    end)
+end
 
 function CLASS.GiveEquipment(self, subClass)
     local ply = self
     local flashlight = self:Give("hg_flashlight")
     flashlight:Use(self)
-
     giveSubClassLoadout(ply, subClass or "default")
 end
 
 --;; Серверная часть: звуки боли, перезарядки и т.п.
 if SERVER then
     local paintable = {
-        [HITGROUP_STOMACH] = function(ply,ent)
-            local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-            local snd = (ply.painCD and CurTime() < ply.painCD + 10 ) and base_folder.."pain0"..math.random(1,9)..".wav"
-                         or base_folder.."mygut02.wav"
-            ent:EmitSound(snd,80,ply.VoicePitch)
+        [HITGROUP_STOMACH] = function(ply, ent)
+            local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+            local snd = (ply.painCD and CurTime() < ply.painCD + 10) and base_folder .. "pain0" .. math.random(1, 9) .. ".wav" or base_folder .. "mygut02.wav"
+            ent:EmitSound(snd, 80, ply.VoicePitch)
             ply.painCD = CurTime() + SoundDuration(snd)
             ply.lastPhr = snd
         end,
-        [HITGROUP_CHEST] = function(ply,ent)
-            local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-            local snd = base_folder.."pain0"..math.random(1,9)..".wav"
-            ent:EmitSound(snd,80,ply.VoicePitch)
+        [HITGROUP_CHEST] = function(ply, ent)
+            local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+            local snd = base_folder .. "pain0" .. math.random(1, 9) .. ".wav"
+            ent:EmitSound(snd, 80, ply.VoicePitch)
             ply.painCD = CurTime() + SoundDuration(snd)
             ply.lastPhr = snd
         end,
-        [HITGROUP_LEFTARM] = function(ply,ent)
-            local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-            local snd = (ply.painCD and CurTime() < ply.painCD + 10 ) and base_folder.."pain0"..math.random(1,9)..".wav"
-                         or base_folder.."myarm0"..math.random(1,2)..".wav"
-            ent:EmitSound(snd,80,ply.VoicePitch)
+        [HITGROUP_LEFTARM] = function(ply, ent)
+            local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+            local snd = (ply.painCD and CurTime() < ply.painCD + 10) and base_folder .. "pain0" .. math.random(1, 9) .. ".wav" or base_folder .. "myarm0" .. math.random(1, 2) .. ".wav"
+            ent:EmitSound(snd, 80, ply.VoicePitch)
             ply.painCD = CurTime() + SoundDuration(snd)
             ply.lastPhr = snd
         end,
-        [HITGROUP_RIGHTARM] = function(ply,ent)
-            local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-            local snd = (ply.painCD and CurTime() < ply.painCD + 10 ) and base_folder.."pain0"..math.random(1,9)..".wav"
-                         or base_folder.."myarm0"..math.random(1,2)..".wav"
-            ent:EmitSound(snd,80,ply.VoicePitch)
+        [HITGROUP_RIGHTARM] = function(ply, ent)
+            local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+            local snd = (ply.painCD and CurTime() < ply.painCD + 10) and base_folder .. "pain0" .. math.random(1, 9) .. ".wav" or base_folder .. "myarm0" .. math.random(1, 2) .. ".wav"
+            ent:EmitSound(snd, 80, ply.VoicePitch)
             ply.painCD = CurTime() + SoundDuration(snd)
             ply.lastPhr = snd
         end,
-        [HITGROUP_RIGHTLEG] = function(ply,ent)
-            local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-            local snd = (ply.painCD and CurTime() < ply.painCD + 10 ) and base_folder.."pain0"..math.random(1,9)..".wav"
-                         or base_folder.."myleg0"..math.random(1,2)..".wav"
-            ent:EmitSound(snd,80,ply.VoicePitch)
+        [HITGROUP_RIGHTLEG] = function(ply, ent)
+            local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+            local snd = (ply.painCD and CurTime() < ply.painCD + 10) and base_folder .. "pain0" .. math.random(1, 9) .. ".wav" or base_folder .. "myleg0" .. math.random(1, 2) .. ".wav"
+            ent:EmitSound(snd, 80, ply.VoicePitch)
             ply.painCD = CurTime() + SoundDuration(snd)
             ply.lastPhr = snd
         end,
-        [HITGROUP_LEFTLEG] = function(ply,ent)
-            local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-            local snd = (ply.painCD and CurTime() < ply.painCD + 10 ) and base_folder.."pain0"..math.random(1,9)..".wav"
-                         or base_folder.."myleg0"..math.random(1,2)..".wav"
-            ent:EmitSound(snd,80,ply.VoicePitch)
+        [HITGROUP_LEFTLEG] = function(ply, ent)
+            local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+            local snd = (ply.painCD and CurTime() < ply.painCD + 10) and base_folder .. "pain0" .. math.random(1, 9) .. ".wav" or base_folder .. "myleg0" .. math.random(1, 2) .. ".wav"
+            ent:EmitSound(snd, 80, ply.VoicePitch)
             ply.painCD = CurTime() + SoundDuration(snd)
             ply.lastPhr = snd
         end
@@ -270,7 +247,7 @@ if SERVER then
     hook.Add("HomigradDamage", "Rebels_painsounds", function(ply, dmgInfo, hitgroup, ent)
         if rebel_classes[ply.PlayerClassName] then
             ply.painCD = ply.painCD or 0
-            if paintable[hitgroup] and (ply.painCD < CurTime()) and ply.organism and not ply.organism.otrub and ply:Alive() and not ply.organism.holdingbreath then 
+            if paintable[hitgroup] and (ply.painCD < CurTime()) and ply.organism and not ply.organism.otrub and ply:Alive() and not ply.organism.holdingbreath then
                 --paintable[hitgroup](ply,ent)
             end
         end
@@ -282,23 +259,20 @@ if SERVER then
         if not IsValid(ply) then return end
         ply.ReloadSND_CD = ply.ReloadSND_CD or 0
         if ply.ReloadSND_CD > CurTime() then return end
-
         local nearby = ents.FindInSphere(ply:GetPos(), 300)
         for _, mate in ipairs(nearby) do
             if mate:IsPlayer() and mate ~= ply and mate:Alive() and rebel_classes[mate.PlayerClassName] then
                 if ply:Alive() and not ply.organism.otrub and rebel_classes[ply.PlayerClassName] and wep.ShellEject ~= "ShotgunShellEject" then
-                    local base_folder = "vo/npc/"..(ThatPlyIsFemale(ply) and "female" or "male").."01/"
-                    local phrase = (math.random(1,2) == 2) and (base_folder.."coverwhilereload01.wav") or (base_folder.."coverwhilereload02.wav")
+                    local base_folder = "vo/npc/" .. (ThatPlyIsFemale(ply) and "female" or "male") .. "01/"
+                    local phrase = (math.random(1, 2) == 2) and (base_folder .. "coverwhilereload01.wav") or (base_folder .. "coverwhilereload02.wav")
                     ply:EmitSound(phrase, 75, ply.VoicePitch)
                     ply.phrCld = CurTime() + (SoundDuration(phrase) or 0)
                     ply.lastPhr = phrase
-                    ply.ReloadSND_CD = CurTime() + SoundDuration(phrase)*3
+                    ply.ReloadSND_CD = CurTime() + SoundDuration(phrase) * 3
                     return
                 end
             end
         end
     end)
 end
-
-
 return CLASS
