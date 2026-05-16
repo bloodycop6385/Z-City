@@ -1,7 +1,7 @@
 if engine.ActiveGamemode() != "zcity" then return end
 
 hg = hg or {}
-hg.Version = "Release 1.4.0"
+hg.Version = "Release 1.4.1"
 hg.GitHub_ReposOwner = "uzelezz123"
 hg.GitHub_ReposName = "Z-City" -- please add your real git fork!
 
