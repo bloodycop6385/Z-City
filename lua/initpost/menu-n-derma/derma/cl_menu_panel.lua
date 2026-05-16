@@ -2,7 +2,7 @@ local PANEL = {}
 local curent_panel 
 local red_select = Color(192,0,0)
 
-DISCORD_URL = "https://discord.gg/475EmEdTgH"
+DISCORD_URL = "https://discord.gg/MpWHkcqzyB"
 
 local Selects = {
     {Title = "Disconnect", Func = function(luaMenu) RunConsoleCommand("disconnect") end},
