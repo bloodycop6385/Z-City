@@ -657,7 +657,7 @@ end
 
 local function PossessNPC(ply, npc)
     if not CanPossessNPC(ply, npc) then return false end
-    
+
     local npcPos = npc:GetPos()
     local npcAngles = npc:GetAngles()
     local npcWeapon = GetNPCWeapon(npc)
