@@ -123,21 +123,7 @@ hook.Add("HUDPaint", "zb_waiting_for_players", function()
 end)
 
 hook.Add("HUDPaint","FUCKINGSAMENAMEUSEDINHOOKFUCKME",function()
-    if LocalPlayer():Alive() then return end
-	local spect = LocalPlayer():GetNWEntity("spect")
-	if not IsValid(spect) then return end
-	if viewmode == 3 then return end
-	
-	surface.SetFont("HomigradFont")
-	surface.SetTextColor(255, 255, 255, 255)
-	local txt = "Spectating player: "..spect:Name()
-	local w, h = surface.GetTextSize(txt)
-	surface.SetTextPos(ScrW() / 2 - w / 2, ScrH() / 8 * 7)
-	surface.DrawText(txt)
-	local txt = "In-game name: "..spect:GetPlayerName()
-	local w, h = surface.GetTextSize(txt)
-	surface.SetTextPos(ScrW() / 2 - w / 2, ScrH() / 8 * 7 + h)
-	surface.DrawText(txt)
+	-- DO NOTHING
 end)
 
 hook.Add("HG_CalcView", "zzzzzzzUwU", function(ply, pos, angles, fov)
