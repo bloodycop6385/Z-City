@@ -801,10 +801,16 @@ hook.Add("PostCleanupMap", "RTScleanup", function()
     for _, ply in player.Iterator() do
         ply.RTSUses = 0
         ply.CombinePossessions = 0
+        ply.NextCoopPossessTime = 0
     end
 end)
 
 local zb_coop_respawn_wave = CreateConVar("zb_coop_respawn_wave", "120", FCVAR_SERVER_CAN_EXECUTE, "Seconds between respawn waves in Half-Life 2 CO-OP mode (0 to disable)", 0, 600)
+
+local function SetCoopRespawnWaveState(nextTime, interval)
+    SetGlobalFloat("zb_coop_respawn_wave_next", nextTime or 0)
+    SetGlobalInt("zb_coop_respawn_wave_interval", interval or 0)
+end
 
 local function IsCoopAlly(ply)
     if not IsValid(ply) or not ply:IsPlayer() then return false end
