@@ -79,14 +79,26 @@ local function DrawShadowText(text, font, x, y, col, ax, ay)
     draw.SimpleText(text, font, x, y, col, ax, ay)
 end
 
+local function TrimLastChar(text)
+    if string.utf8len and string.utf8sub then
+        local ok, len = pcall(string.utf8len, text)
+        if ok and len and len > 0 then
+            return len > 1 and string.utf8sub(text, 1, len - 1) or ""
+        end
+    end
+
+    return string.sub(text, 1, #text - 1)
+end
+
 local function FitText(text, font, maxWidth)
     text = tostring(text or "")
+    maxWidth = math.max(maxWidth or 0, 12)
     surface.SetFont(font)
     if surface.GetTextSize(text) <= maxWidth then return text end
 
     local shortened = text
     while #shortened > 0 and surface.GetTextSize(shortened .. "...") > maxWidth do
-        shortened = string.sub(shortened, 1, #shortened - 1)
+        shortened = TrimLastChar(shortened)
     end
 
     return shortened ~= "" and (shortened .. "...") or "..."
@@ -225,8 +237,8 @@ local function DrawStatusBanner(ply, target, stats, alpha)
     local isSpectator = ply:Team() == TEAM_SPECTATOR
     local statusText = isSpectator and "SPECTATOR" or "YOU DIED"
     local statusColor = isSpectator and statusSpectator or statusDead
-    local bannerW = math.min(sw * 0.48, 620)
-    local bannerH = ScreenScaleH(48)
+    local bannerW = math.Clamp(sw * 0.50, 680, 920)
+    local bannerH = ScreenScaleH(54)
     local x = sw * 0.5 - bannerW * 0.5
     local y = ScreenScaleH(24) - (1 - alpha / 255) * ScreenScaleH(24)
     local pulse = 0.65 + math.sin(CurTime() * 4) * 0.18
@@ -243,16 +255,20 @@ local function DrawStatusBanner(ply, target, stats, alpha)
 
     local targetText = IsValid(target) and ("Watching " .. target:Name() .. " | " .. GetRoleName(target)) or "No active target"
     local waveText = GetRespawnWaveText()
-    local detail = isSpectator and targetText or ("Respawn wave in " .. waveText .. " | " .. targetText)
-    DrawShadowText(detail, "ZB_CoopHUDSmall", x + ScreenScale(14), y + bannerH - ScreenScaleH(10), AlphaColor(hudText, alpha * 0.88), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
-
     local counts = stats.alive .. " alive  " .. stats.waiting .. " waiting  " .. stats.spectators .. " spectators"
+    surface.SetFont("ZB_CoopHUDSmall")
+    local countsW = surface.GetTextSize(counts)
+    local detail = isSpectator and targetText or ("Respawn wave in " .. waveText .. " | " .. targetText)
+    local detailMaxW = bannerW - countsW - ScreenScale(44)
+    detail = FitText(detail, "ZB_CoopHUDSmall", detailMaxW)
+
+    DrawShadowText(detail, "ZB_CoopHUDSmall", x + ScreenScale(14), y + bannerH - ScreenScaleH(10), AlphaColor(hudText, alpha * 0.88), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
     DrawShadowText(counts, "ZB_CoopHUDSmall", x + bannerW - ScreenScale(12), y + bannerH - ScreenScaleH(10), AlphaColor(hudMuted, alpha * 0.95), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 end
 
 local function DrawGameStatePanel(stats, alpha)
-    local panelW = math.min(sw * 0.28, 360)
-    local panelH = ScreenScaleH(104)
+    local panelW = math.Clamp(sw * 0.24, 430, 540)
+    local panelH = ScreenScaleH(112)
     local x = ScreenScale(12) - (1 - alpha / 255) * ScreenScale(18)
     local y = sh - panelH - ScreenScaleH(24)
     local waveText, waveProgress = GetRespawnWaveText()
@@ -263,7 +279,7 @@ local function DrawGameStatePanel(stats, alpha)
     DrawShadowText("Round " .. string.FormattedTime(roundLeft, "%02i:%02i:%02i"), "ZB_CoopHUDSmall", x + panelW - ScreenScale(10), y + ScreenScaleH(12), AlphaColor(hudMuted, alpha), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
 
     local rowY = y + ScreenScaleH(35)
-    local rowH = ScreenScaleH(18)
+    local rowH = ScreenScaleH(25)
     local cardW = (panelW - ScreenScale(28)) / 3
     local cards = {
         {stats.alive, "Alive", statusAlive},
@@ -274,8 +290,8 @@ local function DrawGameStatePanel(stats, alpha)
     for i, card in ipairs(cards) do
         local cx = x + ScreenScale(10) + (i - 1) * (cardW + ScreenScale(4))
         DrawPill(cx, rowY, cardW, rowH, card[3], alpha)
-        DrawShadowText(tostring(card[1]), "ZB_CoopHUDText", cx + ScreenScale(5), rowY + rowH * 0.5, AlphaColor(hudText, alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-        DrawShadowText(card[2], "ZB_CoopHUDSmall", cx + cardW - ScreenScale(5), rowY + rowH * 0.5, AlphaColor(hudMuted, alpha), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+        DrawShadowText(tostring(card[1]), "ZB_CoopHUDText", cx + cardW * 0.5, rowY + rowH * 0.36, AlphaColor(hudText, alpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        DrawShadowText(FitText(card[2], "ZB_CoopHUDSmall", cardW - ScreenScale(8)), "ZB_CoopHUDSmall", cx + cardW * 0.5, rowY + rowH * 0.72, AlphaColor(hudMuted, alpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 
     local barX = x + ScreenScale(10)
@@ -300,7 +316,7 @@ local function DrawRoster(alpha)
 
     local rowH = ScreenScaleH(21)
     local visibleRows = math.min(#players, 8)
-    local panelW = math.min(sw * 0.30, 390)
+    local panelW = math.Clamp(sw * 0.28, 460, 590)
     local panelH = ScreenScaleH(35) + visibleRows * rowH
     local x = sw - panelW - ScreenScale(12) + (1 - alpha / 255) * ScreenScale(22)
     local y = ScreenScaleH(96)
@@ -325,15 +341,23 @@ local function DrawRoster(alpha)
         draw.RoundedBox(4, x + ScreenScale(7), rowY + ScreenScaleH(2), panelW - ScreenScale(14), rowH - ScreenScaleH(4), Color(0, 0, 0, rowAlpha * 0.20))
         draw.RoundedBox(4, x + ScreenScale(7), rowY + ScreenScaleH(2), ScreenScale(3), rowH - ScreenScaleH(4), AlphaColor(roleColor, rowAlpha))
 
-        local nameText = FitText(ply:Name(), "ZB_CoopHUDText", panelW * 0.34)
-        DrawShadowText(nameText, "ZB_CoopHUDText", x + ScreenScale(16), rowY + rowH * 0.5, AlphaColor(hudText, rowAlpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+        local innerX = x + ScreenScale(16)
+        local innerW = panelW - ScreenScale(28)
+        local statusW = math.Clamp(panelW * 0.18, 82, 108)
+        local roleW = math.Clamp(panelW * 0.24, 118, 160)
+        local gap = ScreenScale(5)
+        local nameW = math.max(innerW - statusW - roleW - gap * 2, 90)
+        local roleX = innerX + nameW + gap
+        local statusX = roleX + roleW + gap
+        local nameText = FitText(ply:Name(), "ZB_CoopHUDText", nameW)
+        DrawShadowText(nameText, "ZB_CoopHUDText", innerX, rowY + rowH * 0.5, AlphaColor(hudText, rowAlpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 
         local className = ply.PlayerClassName or "Player"
-        local roleText = FitText(roleName .. " / " .. className, "ZB_CoopHUDSmall", panelW * 0.28)
-        DrawShadowText(roleText, "ZB_CoopHUDSmall", x + panelW * 0.58, rowY + rowH * 0.5, AlphaColor(roleColor, rowAlpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        local roleText = FitText(roleName .. " / " .. className, "ZB_CoopHUDSmall", roleW)
+        DrawShadowText(roleText, "ZB_CoopHUDSmall", roleX + roleW * 0.5, rowY + rowH * 0.5, AlphaColor(roleColor, rowAlpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-        DrawPill(x + panelW - ScreenScale(70), rowY + ScreenScaleH(4), ScreenScale(58), rowH - ScreenScaleH(8), stateColor, rowAlpha)
-        DrawShadowText(stateText, "ZB_CoopHUDSmall", x + panelW - ScreenScale(41), rowY + rowH * 0.5, AlphaColor(hudText, rowAlpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        DrawPill(statusX, rowY + ScreenScaleH(4), statusW, rowH - ScreenScaleH(8), stateColor, rowAlpha)
+        DrawShadowText(FitText(stateText, "ZB_CoopHUDSmall", statusW - ScreenScale(8)), "ZB_CoopHUDSmall", statusX + statusW * 0.5, rowY + rowH * 0.5, AlphaColor(hudText, rowAlpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 end
 
@@ -421,7 +445,7 @@ local function DrawWorldMarkers(target, alpha)
 
         local roleColor = GetRoleColor(ply)
         local stateText = GetPlayerState(ply)
-        local label = FitText(ply:Name() .. " | " .. GetRoleName(ply), "ZB_CoopHUDSmall", ScreenScale(145))
+        local label = FitText(ply:Name() .. " | " .. GetRoleName(ply), "ZB_CoopHUDSmall", math.Clamp(sw * 0.15, 180, 280))
         local w = 0
         surface.SetFont("ZB_CoopHUDSmall")
         w = surface.GetTextSize(label)
