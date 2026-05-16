@@ -355,7 +355,7 @@ function MODE:GiveEquipment()
         for _, ply in RandomPairs(players) do
             if ply == priorityGordon then continue end
             local pos = self:GetPlySpawn(ply)
-            
+
             if not ply:Alive() then continue end
 
             ply:SetSuppressPickupNotices(true)
