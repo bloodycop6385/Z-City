@@ -940,6 +940,7 @@ end)
 
 hook.Add("ZB_EndRound", "CoopRespawnWaveStop", function()
     timer.Remove("CoopRespawnWave")
+    SetCoopRespawnWaveState(0, 0)
 end)
 
 cvars.AddChangeCallback("zb_coop_respawn_wave", function()
