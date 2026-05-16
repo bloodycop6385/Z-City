@@ -123,7 +123,7 @@ end
 function MODE:Intermission()
 	game.CleanUpMap()
 
-	-- for k, ply in ipairs(player.GetAll()) do
+	-- for k, ply in player.Iterator() do
 	-- 	//ply:KillSilent()
 
 	-- 	-- ply:SetupTeam(0)
@@ -453,7 +453,7 @@ function MODE:SpawnDeltaSquad(count)
 	local spawned = 0
 	local SpawnedPlayers = {}
 
-	for i, ply in RandomPairs(player.GetAll()) do
+	for i, ply in Randomplayer.Iterator() do
 		if ply:Alive() or ply:Team() == TEAM_SPECTATOR or ply.afkTime2 > 60 then continue end
 		if spawned >= count then break end
 
