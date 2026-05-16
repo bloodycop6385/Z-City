@@ -1,61 +1,28 @@
 local CLASS = player.RegClass("Rebel")
-
-local combines = {
-    "npc_combine_s",
-    "npc_metropolice",
-    "npc_helicopter",
-    "npc_combinegunship",
-    "npc_combine",
-    "npc_stalker",
-    "npc_hunter",
-    "npc_strider",
-    "npc_turret_floor",
-	"npc_combine_camera",
-    "npc_manhack",
-    "npc_cscanner",
-    "npc_clawscanner"
-}
-
-local rebels = {
-    "npc_barney",
-    "npc_citizen",
-    "npc_dog",
-    "npc_eli",
-    "npc_kleiner",
-    "npc_magnusson",
-    "npc_monk",
-    "npc_mossman",
-    "npc_odessa",
-    "npc_rollermine_hacked",
-    "npc_turret_floor_resistance",
-    "npc_vortigaunt",
-    "npc_alyx"
-}
-
+local combines = {"npc_combine_s", "npc_metropolice", "npc_helicopter", "npc_combinegunship", "npc_combine", "npc_stalker", "npc_hunter", "npc_strider", "npc_turret_floor", "npc_combine_camera", "npc_manhack", "npc_cscanner", "npc_clawscanner"}
+local rebels = {"npc_barney", "npc_citizen", "npc_dog", "npc_eli", "npc_kleiner", "npc_magnusson", "npc_monk", "npc_mossman", "npc_odessa", "npc_rollermine_hacked", "npc_turret_floor_resistance", "npc_vortigaunt", "npc_alyx"}
 function CLASS.Off(self)
     if CLIENT then return end
-    
-    for k,v in ipairs(ents.FindByClass("npc_*")) do
-        if table.HasValue(rebels,v:GetClass()) then
-            v:AddEntityRelationship( self, D_HT, 99 )
-        elseif table.HasValue(combines,v:GetClass()) then
-            v:AddEntityRelationship( self, D_LI, 0 )
+    for k, v in ipairs(ents.FindByClass("npc_*")) do
+        if table.HasValue(rebels, v:GetClass()) then
+            v:AddEntityRelationship(self, D_HT, 99)
+        elseif table.HasValue(combines, v:GetClass()) then
+            v:AddEntityRelationship(self, D_LI, 0)
         end
     end
 end
 
 CLASS.CanUseDefaultPhrase = true
-
 local rebel_models = {
-    ["Male 01"]   = "models/player/group03/male_01.mdl",
-    ["Male 02"]   = "models/player/group03/male_02.mdl",
-    ["Male 03"]   = "models/player/group03/male_03.mdl",
-    ["Male 04"]   = "models/player/group03/male_04.mdl",
-    ["Male 05"]   = "models/player/group03/male_05.mdl",
-    ["Male 06"]   = "models/player/group03/male_06.mdl",
-    ["Male 07"]   = "models/player/group03/male_07.mdl",
-    ["Male 08"]   = "models/player/group03/male_08.mdl",
-    ["Male 09"]   = "models/player/group03/male_09.mdl",
+    ["Male 01"] = "models/player/group03/male_01.mdl",
+    ["Male 02"] = "models/player/group03/male_02.mdl",
+    ["Male 03"] = "models/player/group03/male_03.mdl",
+    ["Male 04"] = "models/player/group03/male_04.mdl",
+    ["Male 05"] = "models/player/group03/male_05.mdl",
+    ["Male 06"] = "models/player/group03/male_06.mdl",
+    ["Male 07"] = "models/player/group03/male_07.mdl",
+    ["Male 08"] = "models/player/group03/male_08.mdl",
+    ["Male 09"] = "models/player/group03/male_09.mdl",
     ["Female 01"] = "models/player/group03/female_01.mdl",
     ["Female 02"] = "models/player/group03/female_02.mdl",
     ["Female 03"] = "models/player/group03/female_03.mdl",
@@ -65,15 +32,15 @@ local rebel_models = {
 }
 
 local rebel_medic_models = {
-    ["models/player/group03/male_01.mdl"]   = "models/player/group03m/male_01.mdl",
-    ["models/player/group03/male_02.mdl"]   = "models/player/group03m/male_02.mdl",
-    ["models/player/group03/male_03.mdl"]   = "models/player/group03m/male_03.mdl",
-    ["models/player/group03/male_04.mdl"]   = "models/player/group03m/male_04.mdl",
-    ["models/player/group03/male_05.mdl"]   = "models/player/group03m/male_05.mdl",
-    ["models/player/group03/male_06.mdl"]   = "models/player/group03m/male_06.mdl",
-    ["models/player/group03/male_07.mdl"]   = "models/player/group03m/male_07.mdl",
-    ["models/player/group03/male_08.mdl"]   = "models/player/group03m/male_08.mdl",
-    ["models/player/group03/male_09.mdl"]   = "models/player/group03m/male_09.mdl",
+    ["models/player/group03/male_01.mdl"] = "models/player/group03m/male_01.mdl",
+    ["models/player/group03/male_02.mdl"] = "models/player/group03m/male_02.mdl",
+    ["models/player/group03/male_03.mdl"] = "models/player/group03m/male_03.mdl",
+    ["models/player/group03/male_04.mdl"] = "models/player/group03m/male_04.mdl",
+    ["models/player/group03/male_05.mdl"] = "models/player/group03m/male_05.mdl",
+    ["models/player/group03/male_06.mdl"] = "models/player/group03m/male_06.mdl",
+    ["models/player/group03/male_07.mdl"] = "models/player/group03m/male_07.mdl",
+    ["models/player/group03/male_08.mdl"] = "models/player/group03m/male_08.mdl",
+    ["models/player/group03/male_09.mdl"] = "models/player/group03m/male_09.mdl",
     ["models/player/group03/female_01.mdl"] = "models/player/group03m/female_01.mdl",
     ["models/player/group03/female_02.mdl"] = "models/player/group03m/female_02.mdl",
     ["models/player/group03/female_03.mdl"] = "models/player/group03m/female_03.mdl",
@@ -82,75 +49,28 @@ local rebel_medic_models = {
     ["models/player/group03/female_06.mdl"] = "models/player/group03m/female_06.mdl"
 }
 
-
-local primary_weapons = {
-    "weapon_akm",
-    "weapon_asval",
-    "weapon_mp7",
-    "weapon_spas12",
-    "weapon_xm1014",
-    "weapon_svd",
-    "weapon_osipr"
-}
-
+local primary_weapons = {"weapon_akm", "weapon_asval", "weapon_mp7", "weapon_spas12", "weapon_xm1014", "weapon_svd", "weapon_osipr"}
 local primary_attachments = {
-    ["weapon_svd"] = function(ply, wep)
-        if IsValid(wep) then
-            hg.AddAttachmentForce(ply,wep,"optic11")
-        end
-    end,
+    ["weapon_svd"] = function(ply, wep) if IsValid(wep) then hg.AddAttachmentForce(ply, wep, "optic11") end end,
 }
 
-local secondary_weapons = {
-    "weapon_m9beretta",
-    "weapon_browninghp",
-    "weapon_revolver357",
-    "weapon_revolver2",
-    "weapon_hk_usp",
-    "weapon_glock17"
-}
-
-local helmet_list = {
-    "helmet1",
-    "helmet7"
-    --"helmet5",
-}
-
-local face_list = {
-    "mask1",
-	"mask3",
-    "nightvision1",
-    "",
-    "",
-    "",
-    "",
-    ""
-}
-
-local vest_list = {
-    "vest5",
-    "vest4",
-    "vest1"
-}
-
+local secondary_weapons = {"weapon_m9beretta", "weapon_browninghp", "weapon_revolver357", "weapon_revolver2", "weapon_hk_usp", "weapon_glock17"}
+local helmet_list = {"helmet1", "helmet7"}
+--"helmet5",
+local face_list = {"mask1", "mask3", "nightvision1", "", "", "", "", ""}
+local vest_list = {"vest5", "vest4", "vest1"}
 local rebel_subclasses = {
     default = {
         give_fn = function(ply)
             local wep1 = ply:Give(primary_weapons[math.random(#primary_weapons)])
             ply:GiveAmmo(wep1:GetMaxClip1() * 3, wep1:GetPrimaryAmmoType(), true)
-
-            if isfunction(primary_attachments[wep1:GetClass()]) then
-                primary_attachments[wep1:GetClass()](ply, wep1)
-            end
-
+            if isfunction(primary_attachments[wep1:GetClass()]) then primary_attachments[wep1:GetClass()](ply, wep1) end
             local wep2 = ply:Give(secondary_weapons[math.random(#secondary_weapons)])
             ply:GiveAmmo(wep2:GetMaxClip1() * 3, wep2:GetPrimaryAmmoType(), true)
-
             local wep_g = ply:Give("weapon_hg_hl2nade_tpik")
             if wep_g then wep_g.count = 1 end
         end
     },
-
     medic = {
         give_fn = function(ply)
             ply:Give("weapon_bandage_sh")
@@ -166,34 +86,28 @@ local rebel_subclasses = {
             ply:Give("weapon_needle")
             ply:Give("weapon_betablock")
             ply:Give("weapon_adrenaline")
-
             local wep1 = ply:Give(primary_weapons[math.random(#primary_weapons)])
             ply:GiveAmmo(wep1:GetMaxClip1() * 3, wep1:GetPrimaryAmmoType(), true)
-            //hg.AddAttachmentForce(ply, wep1, "ent_att_laser2")
-
+            --hg.AddAttachmentForce(ply, wep1, "ent_att_laser2")
             local wep2 = ply:Give(secondary_weapons[math.random(#secondary_weapons)])
             ply:GiveAmmo(wep2:GetMaxClip1() * 3, wep2:GetPrimaryAmmoType(), true)
         end
     },
-
     sniper = {
         give_fn = function(ply)
             local wep1 = ply:Give("weapon_hg_crossbow")
             ply:GiveAmmo(wep1:GetMaxClip1() * 10, wep1:GetPrimaryAmmoType(), true)
-
             local wep2 = ply:Give("weapon_revolver357")
             ply:GiveAmmo(wep2:GetMaxClip1() * 3, wep2:GetPrimaryAmmoType(), true)
         end
     },
-
     grenadier = {
         give_fn = function(ply)
-            ply:Give(math.random(0,1) == 1 and "weapon_hg_rebelrpg" or "weapon_hg_rpg")
+            ply:Give(math.random(0, 1) == 1 and "weapon_hg_rebelrpg" or "weapon_hg_rpg")
             ply:Give("weapon_claymore")
             ply:Give("weapon_traitor_ied")
             ply:Give("weapon_hg_slam")
             ply:Give("weapon_hg_pipebomb_tpik")
-
             local wep = ply:Give("weapon_revolver357")
             ply:GiveAmmo(wep:GetMaxClip1() * 3, wep:GetPrimaryAmmoType(), true)
         end
@@ -202,34 +116,26 @@ local rebel_subclasses = {
 
 local function giveSubClassLoadout(ply, subClass)
     local cfg = rebel_subclasses[subClass] or rebel_subclasses["default"]
-    
     cfg.give_fn(ply)
-
     --;; Система случайного говна
     ply.armors = ply.armors or {}
     local randVest = vest_list[math.random(#vest_list)]
     local randFace = face_list[math.random(#face_list)]
     local randHelmet = helmet_list[math.random(#helmet_list)]
-
     if randVest ~= "" then hg.AddArmor(ply, randVest) end
     if randHelmet ~= "" then hg.AddArmor(ply, randHelmet) end
     if randFace ~= "" then hg.AddArmor(ply, randFace) end
-
     ply:SyncArmor()
-
     ply:Give("weapon_melee")
     ply:Give("weapon_walkie_talkie")
 end
 
-
 function CLASS.On(self, data)
     if CLIENT then return end
-
-    ApplyAppearance(self,nil,nil,nil,true)
+    ApplyAppearance(self, nil, nil, nil, true)
     local appearance = self.CurAppearance or hg.Appearance.GetRandomAppearance()
     appearance.AAttachments = ""
     appearance.AColthes = ""
-
     local mdl_key = appearance.AModel
     if not rebel_models[mdl_key] then
         self:ChatPrint("zcity/appearance.json have invalid variables.. Setting random Appearance")
