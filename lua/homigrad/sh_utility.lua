@@ -336,7 +336,7 @@ hg.ConVars = hg.ConVars or {}
 		end
 	end
 --//
-//for i, ply in ipairs(player.GetAll()) do
+//for i, ply in player.Iterator() do
 //	hg.tpPlayer(Vector(44.917309, 1.110850, -82.409622), ply, i, 0)
 //end
 

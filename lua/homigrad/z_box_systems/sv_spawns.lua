@@ -149,7 +149,7 @@ function Hook.HG_PlayerSay(ply, txtTbl, text)
    --    local targetPlayer = nil
 
    --   
-   --    for _, player in ipairs(player.GetAll()) do
+   --    for _, player in player.Iterator() do
    --        if string.find(string.lower(player:Nick()), string.lower(targetName)) then
    --            targetPlayer = player
    --            break
