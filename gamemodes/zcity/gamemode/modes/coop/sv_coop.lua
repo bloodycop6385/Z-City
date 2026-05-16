@@ -50,50 +50,50 @@ function MODE:GetLootTable()
     local mapData = self.Maps[currentMap] or {PlayerEqipment = "rebel"}
 
     local lootData = mapData.PlayerEqipment == "rebel" and self.LootTable[2] or self.LootTable[1]
-    return lootData[2] 
+    return lootData[2]
 end
 
 
 MODE.LootTable = {
-	[1] = {1, {
-		{4,"ent_ammo_9x19mmparabellum"},
-		{3,"ent_ammo_4.6x30mm"},
-		{3,"weapon_bigconsumable"},
-		{3,"weapon_painkillers"},
-		{3,"weapon_bigbandage_sh"},
-		
+    [1] = {1, {
+        {4,"ent_ammo_9x19mmparabellum"},
+        {3,"ent_ammo_4.6x30mm"},
+        {3,"weapon_bigconsumable"},
+        {3,"weapon_painkillers"},
+        {3,"weapon_bigbandage_sh"},
+
         {2,"weapon_medkit_sh"},
-		{2,"weapon_bloodbag"},
-		
+        {2,"weapon_bloodbag"},
+
         {1,"weapon_mini14"},
         {1,"ent_ammo_5.56x45mm"},
         {1,"weapon_m16a2"},
     }},
-	
-	[2] = {1, {
-		{9,"ent_ammo_pulse"},
-		{9,"ent_ammo_9x19mmparabellum"},
-		{9,"ent_ammo_4.6x30mm"},
-		{9,"ent_ammo_12/70gauge"},
-		{9,"ent_ammo_12/70slug"},
-		{9,"ent_ammo_.357magnum"},
+
+    [2] = {1, {
+        {9,"ent_ammo_pulse"},
+        {9,"ent_ammo_9x19mmparabellum"},
+        {9,"ent_ammo_4.6x30mm"},
+        {9,"ent_ammo_12/70gauge"},
+        {9,"ent_ammo_12/70slug"},
+        {9,"ent_ammo_.357magnum"},
         {5,"ent_ammo_12.7x108mm"},
         {7,"ent_ammo_7.62x39mm"},
         {7,"ent_ammo_5.45x39mm"},
         {6,"ent_ammo_rpg-7projectile"},
-        
+
         {8,"weapon_bigconsumable"},
-		{7,"weapon_painkillers"},
-		{6,"weapon_bigbandage_sh"},
+        {7,"weapon_painkillers"},
+        {6,"weapon_bigbandage_sh"},
         {5,"weapon_morphine"},
         {5,"weapon_naloxone"},
         {4,"weapon_mannitol"},
-        
+
         {9,"weapon_hk_usp"},
         {8,"weapon_revolver357"},
-		{6,"weapon_spas12"},
-		{5,"weapon_mp7"},
-		{5,"weapon_osipr"},
+        {6,"weapon_spas12"},
+        {5,"weapon_mp7"},
+        {5,"weapon_osipr"},
         {2,"weapon_ash12"},
         {4,"weapon_akm"},
         {3,"weapon_rpk"},
