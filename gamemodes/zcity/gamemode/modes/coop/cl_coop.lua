@@ -26,23 +26,6 @@ function MODE:RenderScreenspaceEffects()
 end
 
 function MODE:HUDPaint()
-
-	local startTimer = GetGlobalVar("coop_first_round_timer", 0)
-
-	if startTimer > CurTime() then
-		surface.SetFont("ZB_HomicideMediumLarge")
-
-		local w, h = surface.GetTextSize("Awaiting players: ")
-		local w2, h2 = surface.GetTextSize("00:00")
-
-		surface.SetTextPos(sw * 0.5 - (w + w2) * 0.5, sh * 0.1 - h * 0.5)
-		surface.SetTextColor(Color(0,162,255, 255))
-		surface.DrawText("Awaiting players: ")
-		
-		surface.SetTextPos(sw * 0.5 + (w - w2) * 0.5, sh * 0.1 - h * 0.5)
-		surface.DrawText(string.FormattedTime(startTimer - CurTime(), "%02i:%02i"))
-	end
-
     if zb.ROUND_START + 8.5 < CurTime() then return end
 
 	if not lply:Alive() then return end

@@ -102,6 +102,26 @@ local keydownattack
 local keydownattack2
 local keydownreload
 
+hook.Add("HUDPaint", "zb_waiting_for_players", function()
+	if not GetGlobalVar("zb_round_waiting_players", false) then return end
+
+	local startTimer = GetGlobalVar("zb_round_start_timer", 0)
+	if startTimer <= CurTime() then return end
+
+	surface.SetFont("ZB_InterfaceMediumLarge")
+
+	local label = "Waiting for players: "
+	local w, h = surface.GetTextSize(label)
+	local w2 = surface.GetTextSize("00:00")
+
+	surface.SetTextColor(0, 162, 255, 255)
+	surface.SetTextPos(ScrW() * 0.5 - (w + w2) * 0.5, ScrH() * 0.1 - h * 0.5)
+	surface.DrawText(label)
+
+	surface.SetTextPos(ScrW() * 0.5 + (w - w2) * 0.5, ScrH() * 0.1 - h * 0.5)
+	surface.DrawText(string.FormattedTime(startTimer - CurTime(), "%02i:%02i"))
+end)
+
 hook.Add("HUDPaint","FUCKINGSAMENAMEUSEDINHOOKFUCKME",function()
     if LocalPlayer():Alive() then return end
 	local spect = LocalPlayer():GetNWEntity("spect")

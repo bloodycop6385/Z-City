@@ -1,15 +1,7 @@
 local player_GetAll = player.GetAll
 zb.modes = zb.modes or {}
 
-if zb.coop_awaiting_players == nil then zb.coop_awaiting_players = true end
-
-hook.Add("PlayerDisconnected", "zb_coop_awaiting_players", function()
-	timer.Simple(0, function()
-		if #player.GetAll() < 2 then
-			zb.coop_awaiting_players = true
-		end
-	end)
-end)
+zb.FIRST_ROUND_WAIT = zb.FIRST_ROUND_WAIT or 120
 
 util.AddNetworkString("FadeScreen")
 
@@ -66,14 +58,13 @@ function zb:PreRound()
 	if zb.ROUND_STATE == 0 and #player_GetAll() > 1 then
 		zb.END_TIME = nil
 
-		local isCoop = zb.nextround == "coop" or (CurrentRound() and CurrentRound().name == "coop")
-		local waitTime = isCoop and 60 or (CurrentRound().start_time or 5)
+		local isFirstRound = (zb.Roundscount or 0) == 0 and not GetConVar("zb_dev"):GetBool()
+		local waitTime = isFirstRound and zb.FIRST_ROUND_WAIT or (CurrentRound().start_time or 5)
 
 		if not zb.START_TIME then
 			zb.START_TIME = CurTime() + waitTime
-			if isCoop then
-				SetGlobalVar("coop_first_round_timer", zb.START_TIME)
-			end
+			SetGlobalVar("zb_round_start_timer", zb.START_TIME)
+			SetGlobalVar("zb_round_waiting_players", isFirstRound)
 		end
 
 		if zb.START_TIME < CurTime() then zb:RoundStart() end
@@ -150,11 +141,6 @@ function zb:EndRoundThink()
 	if zb.ROUND_STATE == 3 then
 		if !zb.END_TIME then
 			zb.END_TIME = (CurTime() + (CurrentRound().end_time or 5))
-			if zb.nextround == "coop" and GetGlobalVar("coop_first_round_timer", 0) == 0 then
-
-				zb.END_TIME = (CurTime() + (GetConVar("zb_dev") and 5 or 60))
-				SetGlobalVar("coop_first_round_timer", zb.END_TIME)
-			end
 		end
 		
 		zb.SHOULD_FADE = zb.SHOULD_FADE != nil and zb.SHOULD_FADE or true
@@ -583,7 +569,7 @@ function zb:RoundStart()
 
 	zb.ROUND_STATE = 1
 	zb.START_TIME = nil
-	zb.coop_awaiting_players = false
+	SetGlobalVar("zb_round_waiting_players", false)
 
 	local mode, round = CurrentRound()
 
