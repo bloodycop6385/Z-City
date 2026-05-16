@@ -45,3 +45,21 @@ COMMANDS.respawn = {
 	end,
 	0
 }
+
+COMMANDS.respawndead = {
+	function(ply, args)
+		if not ply:IsAdmin() then return end
+		local count = 0
+		for _, ply2 in player.Iterator() do
+			if not ply2:Alive() then
+				ply2:Spawn()
+				ApplyAppearance( ply2 )
+				local hands = ply2:Give("weapon_hands_sh")
+				ply2:SelectWeapon(hands)
+				count = count + 1
+			end
+		end
+		ply:ChatPrint( count.. " dead player(s) respawned" )
+	end,
+	0
+}
