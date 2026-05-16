@@ -909,7 +909,7 @@ local function CoopRespawnWave()
     end
 
     if respawned > 0 then
-        PrintMessage(HUD_PRINTTALK, "[CO-OP] Respawn wave: "..respawned.." player(s) respawned.")
+        PrintMessage(HUD_PRINTTALK, "[CO-OP] Respawn wave: " .. respawned .. " player(s) respawned.")
 
         for _, rag in ipairs(ents.FindByClass("prop_ragdoll")) do
             if not IsValid(rag) then continue end
