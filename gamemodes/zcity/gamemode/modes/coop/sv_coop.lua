@@ -586,6 +586,59 @@ local function GetNPCWeapon(npc)
 end
 
 local clr_combine, clr_metrocop, clr_zombie = Color(0, 180, 180), Color(0, 100, 255), Color(100, 0, 0)
+local clr_combine_elite, clr_combine_shotgunner = Color(246, 13, 13), Color(220, 0, 0)
+local coopPossessDefaultLoadout = {"Rebel", "Rebel", clr_rebel}
+local coopPossessMetrocopLoadout = {"Metrocop", "Metrocop", clr_metrocop}
+local coopPossessCombineDefaultLoadout = {"Combine", "Combine", clr_combine, nil, "default"}
+local coopPossessCombineSniperLoadout = {"Combine", "Sniper", clr_combine, nil, "sniper"}
+local coopPossessCombineShotgunnerLoadout = {"Combine", "Shotgunner", clr_combine_shotgunner, nil, "shotgunner"}
+local coopPossessCombineEliteLoadout = {"Combine", "Elite", clr_combine_elite, nil, "elite"}
+local coopPossessNPCLoadouts = {
+    ["npc_combine_s"] = coopPossessCombineDefaultLoadout,
+    ["npc_metropolice"] = coopPossessMetrocopLoadout,
+    ["npc_zombie"] = {"headcrabzombie", "Zombie", clr_zombie},
+}
+local coopPossessEquipmentLoadouts = {
+    ["refugee"] = {"Refugee", "Refugee", clr_rebel, {bNoEquipment = false}},
+    ["citizen"] = {"Refugee", "Refugee", clr_rebel, {bNoEquipment = true}},
+    ["rebel"] = coopPossessDefaultLoadout,
+}
+local coopPossessCombineSkin0Loadouts = {
+    coopPossessCombineDefaultLoadout,
+    coopPossessCombineDefaultLoadout,
+    coopPossessCombineDefaultLoadout,
+    coopPossessCombineSniperLoadout,
+}
+local coopPossessCombineSoldierSkinLoadouts = {
+    [0] = coopPossessCombineSkin0Loadouts,
+    [1] = coopPossessCombineShotgunnerLoadout,
+}
+local coopPossessCombineModelLoadouts = {
+    ["models/combine_soldier.mdl"] = {skins = coopPossessCombineSoldierSkinLoadouts},
+    ["models/combine_soldier_prisonguard.mdl"] = {
+        skins = coopPossessCombineSoldierSkinLoadouts,
+        model = "models/player/combine_soldier_prisonguard.mdl",
+    },
+    ["models/combine_super_soldier.mdl"] = {loadout = coopPossessCombineEliteLoadout},
+}
+
+local function GetCombinePossessLoadout(npcClass, npcModel, npcSkin)
+    if npcClass ~= "npc_combine_s" then return coopPossessNPCLoadouts[npcClass] or coopPossessMetrocopLoadout end
+
+    local config = coopPossessCombineModelLoadouts[npcModel]
+    if not config then return coopPossessCombineDefaultLoadout, nil, npcSkin end
+
+    local loadout = config.loadout
+    if not loadout then
+        loadout = config.skins[npcSkin] or config.skins[0] or coopPossessCombineDefaultLoadout
+        if type(loadout[1]) == "table" then
+            loadout = loadout[math.random(#loadout)]
+        end
+    end
+
+    return loadout, config.model, npcSkin
+end
+
 local function PossessNPC(ply, npc)
     if not CanPossessNPC(ply, npc) then return false end
     
@@ -595,6 +648,11 @@ local function PossessNPC(ply, npc)
     local npcHealth = npc:Health()
     local npcClass = npc:GetClass()
     local isCombine = combineNPCClasses[npcClass]
+    local npcModel, npcSkin
+    if isCombine then
+        npcModel = string.lower(npc:GetModel() or "")
+        npcSkin = npc:GetSkin() or 0
+    end
 	local isZombie = zombieNPCClasses[npcClass]
     
     local currentMap = game.GetMap()
@@ -627,27 +685,20 @@ local function PossessNPC(ply, npc)
             ply:SetNetVar("Inventory", inv)
         end
         
-        if isCombine then --!! TODO: rewrite all of this elseif shit to beautiful table
-            if npcClass == "npc_combine_s" then
-                ply:SetPlayerClass("Combine")
-                zb.GiveRole(ply, "Combine", clr_combine)
-            else
-                ply:SetPlayerClass("Metrocop")
-                zb.GiveRole(ply, "Metrocop", clr_metrocop)
-            end
-        elseif playerClass == "refugee" or playerClass == "citizen" then
-            ply:SetPlayerClass("Refugee", {bNoEquipment = playerClass == "citizen"})
-            zb.GiveRole(ply, "Refugee", clr_rebel)
-        elseif playerClass == "rebel" then
-            ply:SetPlayerClass("Rebel")
-            zb.GiveRole(ply, "Rebel", clr_rebel)
-		elseif isZombie then
-            ply:SetPlayerClass("headcrabzombie")
-            zb.GiveRole(ply, "Zombie", clr_zombie)
+        local loadout, modelOverride, skinOverride
+        if isCombine then
+            loadout, modelOverride, skinOverride = GetCombinePossessLoadout(npcClass, npcModel, npcSkin)
         else
-            ply:SetPlayerClass("Rebel")
-            zb.GiveRole(ply, "Rebel", clr_rebel)
+            loadout = coopPossessEquipmentLoadouts[playerClass] or (isZombie and coopPossessNPCLoadouts[npcClass]) or coopPossessDefaultLoadout
         end
+        if loadout[5] then ply.subClass = loadout[5] end
+        ply:SetPlayerClass(loadout[1], loadout[4])
+        if modelOverride then
+            ply:SetModel(modelOverride)
+            ply:SetSubMaterial()
+        end
+        if skinOverride then ply:SetSkin(skinOverride) end
+        zb.GiveRole(ply, loadout[2], loadout[3])
         
         ply:Give("weapon_hands_sh")
         
