@@ -275,11 +275,11 @@ local function getspawnpos(i)
             tab[#tab + 1] = v:GetPos()
         end
     end
-    
+
     if #tab == 0 then
         tab[#tab + 1] = Vector(0, 0, 0)
     end
-    
+
     local index = math.Clamp(i % #tab + 1, 1, #tab)
     return tab[index] or Vector(0, 0, 0)
 end
