@@ -720,16 +720,16 @@ local function PossessNPC(ply, npc)
         end
         if skinOverride then ply:SetSkin(skinOverride) end
         zb.GiveRole(ply, loadout[2], loadout[3])
-        
+
         ply:Give("weapon_hands_sh")
-        
+
         if npcWeapon then
             local wep = ply:Give(npcWeapon)
             if IsValid(wep) then
                 ply:SelectWeapon(npcWeapon)
             end
         end
-        
+
         timer.Simple(0.1, function()
             if IsValid(ply) then
                 ply.noSound = false
