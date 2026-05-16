@@ -703,7 +703,7 @@ function MODE:Intermission()
 	
 	-- -- potom
 	
-	for i, ply in RandomPairs(player.GetAll()) do
+	for i, ply in Randomplayer.Iterator() do
 		if ply.isTraitor or ply:Team() == TEAM_SPECTATOR then continue end
 		if math.random(100) > (ply.Karma or 100) then continue end
 
@@ -718,7 +718,7 @@ function MODE:Intermission()
 	end
 
 	//MODE.NextRoundMainTraitors = MODE.NextRoundMainTraitors or {}
-	for i, ply in RandomPairs(player.GetAll()) do
+	for i, ply in Randomplayer.Iterator() do
 		if ply.isTraitor or ply:Team() == TEAM_SPECTATOR then continue end
 		//if not MODE.NextRoundMainTraitors[ply:SteamID()] then continue end
 
@@ -735,7 +735,7 @@ function MODE:Intermission()
 	end
 
 	if traitors_needed > 0 then
-		for i, ply in RandomPairs(player.GetAll()) do
+		for i, ply in Randomplayer.Iterator() do
 			if ply.isTraitor or ply:Team() == TEAM_SPECTATOR then continue end
 
 			if traitors_needed > 0 then
@@ -794,7 +794,7 @@ function MODE:Intermission()
 	
 	ent:SetModel(mdl)
 	
-	for i, ply in RandomPairs(player.GetAll()) do
+	for i, ply in Randomplayer.Iterator() do
 		ent:SetPos(ply:EyePos() + vector_up * 72)
 	end
 
@@ -991,7 +991,7 @@ function MODE:SpawnForce(teamtype, count)
     local spawned = 0
     local basepos = nil
 
-    for i, ply in RandomPairs(player.GetAll()) do
+    for i, ply in Randomplayer.Iterator() do
         if ply:Alive() or ply.isTraitor or ply:Team() == TEAM_SPECTATOR or ply.afkTime2 > 60 then continue end
         if spawned >= count then break end
 
@@ -1520,7 +1520,7 @@ util.AddNetworkString("HMCD_UpdateTraitorAssistants")
 function MODE.SpawnPlayers(spawn_with_subroles)
     local gunner_found = false
 
-    for i, ply in RandomPairs(player.GetAll()) do
+    for i, ply in Randomplayer.Iterator() do
         if ply.isTraitor or ply.isGunner or ply:Team() == TEAM_SPECTATOR then continue end
         if math.random(100) > (ply.Karma or 100) then continue end
 
@@ -1530,7 +1530,7 @@ function MODE.SpawnPlayers(spawn_with_subroles)
     end
 
     if(not gunner_found)then
-        for i,ply in RandomPairs(player.GetAll()) do
+        for i,ply in Randomplayer.Iterator() do
             if ply.isTraitor or ply.isGunner or ply:Team() == TEAM_SPECTATOR then continue end
 
             ply.isGunner = true
@@ -1558,7 +1558,7 @@ function MODE.SpawnPlayers(spawn_with_subroles)
                 professions_possible[#professions_possible + 1] = {profession_info.Chance, profession}
             end
 
-            for _, ply in RandomPairs(player.GetAll()) do
+            for _, ply in Randomplayer.Iterator() do
                 if(ply:Team() != TEAM_SPECTATOR)then
                     if((math.random(100) <= (ply.Karma or 100)) and (math.random(1, 3) == 1 or (!ply.isTraitor and !ply.isGunner)))then
                         local profession_key, profession = hg.WeightedRandomSelect(professions_possible)
@@ -1575,7 +1575,7 @@ function MODE.SpawnPlayers(spawn_with_subroles)
             
 
             if(professions_count_to_satisfy > 0)then
-                for _, ply in RandomPairs(player.GetAll()) do
+                for _, ply in Randomplayer.Iterator() do
                     if(ply:Team() != TEAM_SPECTATOR and !ply.Profession)then
                         local profession_key, profession = hg.WeightedRandomSelect(professions_possible)
                         professions_possible[profession_key][1] = professions_possible[profession_key][1] / 2

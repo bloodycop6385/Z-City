@@ -141,7 +141,7 @@ function MODE:Intermission()
 
 
 	//MODE.NextRoundMainTraitors = MODE.NextRoundMainTraitors or {}
-	for i, ply in RandomPairs(player.GetAll()) do
+	for i, ply in Randomplayer.Iterator() do
 		if ply.isTraitor or ply:Team() == TEAM_SPECTATOR then continue end
 		//if not MODE.NextRoundMainTraitors[ply:SteamID()] then continue end
 
@@ -157,7 +157,7 @@ function MODE:Intermission()
 	end
 
 
-	for i, ply in RandomPairs(player.GetAll()) do
+	for i, ply in Randomplayer.Iterator() do
 		if ply.isTraitor or ply:Team() == TEAM_SPECTATOR then continue end
 		if math.random(100) > (ply.Karma or 100) then continue end
 
@@ -174,7 +174,7 @@ function MODE:Intermission()
 	end
 
 	if traitors_needed > 0 then
-		for i, ply in RandomPairs(player.GetAll()) do
+		for i, ply in Randomplayer.Iterator() do
 			if ply.isTraitor or ply:Team() == TEAM_SPECTATOR then continue end
 
 			if traitors_needed > 0 then
