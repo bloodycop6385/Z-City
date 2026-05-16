@@ -791,6 +791,7 @@ hook.Add("ZB_RoundStart", "RTSoff", function()
     for _, ply in player.Iterator() do
         ply.RTSUses = 0
         ply.CombinePossessions = 0
+        ply.NextCoopPossessTime = 0
     end
 end)
 
