@@ -72,5 +72,15 @@ MODE.Maps = {
     ["gmhl2_citadel_04"] = {PlayerEqipment = "rebel"},
     ["gmhl2_citadel_05"] = {PlayerEqipment = "rebel"},
     ["gmhl2_breen_01"] = {PlayerEqipment = "rebel"},
-    ["gmhl2_lostcoast"] = {PlayerEqipment = "rebel"}
+    ["gmhl2_lostcoast"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_citadel_00"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_citadel_01"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_citadel_02"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_citadel_02b"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_citadel_03"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_citadel_04"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_c17_00"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_c17_01"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_c17_02"] = {PlayerEqipment = "rebel"},
+    ["gmhl2e1_c17_03"] = {PlayerEqipment = "rebel"}
 }
