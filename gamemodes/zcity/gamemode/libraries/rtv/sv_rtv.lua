@@ -502,7 +502,7 @@ local function rtv(ply, args)
         local votes = table.Count(rtvVotes)
         local remaining = votesNeeded - votes
         
-        --for _, v in pairs(player.GetAll()) do
+        --for _, v in player.Iterator() do
         --    if v ~= ply then БЕСМЫСЛЕННЫЙ СПАМ
         --        v:ChatPrint(ply:Nick() .. " canceled their vote for map change. " .. remaining .. " more votes needed.")
         --    end
@@ -515,7 +515,7 @@ local function rtv(ply, args)
         rtvTimeout = true
         timer.Create("RTVTimeout", 1800, 1, function()
             if table.Count(rtvVotes) > 0 then
-                for _, v in pairs(player.GetAll()) do
+                for _, v in player.Iterator() do
                     v:ChatPrint("Map change votes have been reset due to timeout (30 minutes).")
                 end
                 zb.ClearRTVVotes()
@@ -555,7 +555,7 @@ hook.Add("PlayerDisconnected", "CheckRTVAfterDisconnect", function(ply)
     if rtvVotes[ply:SteamID()] then
         rtvVotes[ply:SteamID()] = nil
         
-        --for _, v in pairs(player.GetAll()) do
+        --for _, v in player.Iterator() do
         --   v:ChatPrint(ply:Nick() .. " left the server (their RTV vote was removed).")
         --end
         
