@@ -889,6 +889,7 @@ local function CoopRespawnWave()
     local anchor = FindBiggestPlayerCluster(1024)
     local respawned = 0
     for _, ply in player.Iterator() do
+        if ply:Team() == TEAM_SPECTATOR then continue end
         if ply:Alive() then continue end
         ply:Spawn()
         if playerClass == "refugee" or playerClass == "citizen" then
