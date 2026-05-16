@@ -292,7 +292,7 @@ function MODE:GetPlySpawn(ply)
 end
 
 function MODE:GetTeamSpawn()
-	return {getspawnpos(math.random(50))}, {getspawnpos(math.random(50))}
+    return {getspawnpos(math.random(50))}, {getspawnpos(math.random(50))}
 end
 
 local clr_rebel, clr_medic, clr_grenadier = Color(255, 155, 0), Color(190, 0, 0), Color(190, 90, 0)
