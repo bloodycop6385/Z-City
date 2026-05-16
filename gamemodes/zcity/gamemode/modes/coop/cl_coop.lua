@@ -123,6 +123,29 @@ local function DrawPill(x, y, w, h, col, alpha)
     surface.DrawOutlinedRect(x, y, w, h, 1)
 end
 
+local function DrawReloadHint(x, y, maxW, alpha)
+    local pulse = 0.65 + math.sin(CurTime() * 5.5) * 0.2
+    local pad = ScreenScale(6)
+    local gap = ScreenScale(4)
+    local keyW = ScreenScale(15)
+    local hintH = ScreenScaleH(17)
+    local hintW = maxW
+    local centerY = y + hintH * 0.5
+
+    surface.SetFont("ZB_CoopHUDSmall")
+    local pressW = surface.GetTextSize("Press")
+    local tailText = FitText("to switch view styles", "ZB_CoopHUDSmall", hintW - pad * 2 - pressW - keyW - gap * 3)
+    local cursorX = x + pad
+
+    DrawPill(x, y, hintW, hintH, hudLine, alpha * (0.72 + pulse * 0.18))
+    DrawShadowText("Press", "ZB_CoopHUDSmall", cursorX, centerY, AlphaColor(hudText, alpha * 0.9), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+    cursorX = cursorX + pressW + gap
+    draw.RoundedBox(4, cursorX, y + ScreenScaleH(3), keyW, hintH - ScreenScaleH(6), Color(hudLine.r, hudLine.g, hudLine.b, alpha * (0.24 + pulse * 0.12)))
+    DrawShadowText("R", "ZB_CoopHUDSmall", cursorX + keyW * 0.5, centerY, AlphaColor(hudText, alpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    cursorX = cursorX + keyW + gap
+    DrawShadowText(tailText, "ZB_CoopHUDSmall", cursorX, centerY, AlphaColor(hudText, alpha * 0.9), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+end
+
 local function GetRoleName(ply)
     if not IsValid(ply) then return "Unknown" end
 
@@ -252,6 +275,11 @@ local function DrawStatusBanner(ply, target, stats, alpha)
     draw.RoundedBox(4, x + ScreenScale(5), y + ScreenScaleH(8), ScreenScale(2), bannerH - ScreenScaleH(16), AlphaColor(statusColor, alpha))
 
     DrawShadowText(statusText, "ZB_CoopHUDStatus", x + ScreenScale(12), y + ScreenScaleH(9), AlphaColor(statusColor, alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+
+    surface.SetFont("ZB_CoopHUDSmall")
+    local desiredHintW = surface.GetTextSize("Press R to switch view styles") + ScreenScale(28)
+    local hintW = math.Clamp(desiredHintW, 230, math.min(340, bannerW * 0.36))
+    DrawReloadHint(x + bannerW - hintW - ScreenScale(12), y + ScreenScaleH(8), hintW, alpha)
 
     local targetText = IsValid(target) and ("Watching " .. target:Name() .. " | " .. GetRoleName(target)) or "No active target"
     local waveText = GetRespawnWaveText()
