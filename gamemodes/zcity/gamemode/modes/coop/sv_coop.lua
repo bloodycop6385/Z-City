@@ -779,7 +779,7 @@ hook.Add("PlayerButtonDown", "checks", function(ply, button)
             end
         end
     end
-    
+
     if IsValid(nearestNPC) then
         PossessNPC(ply, nearestNPC)
     end
