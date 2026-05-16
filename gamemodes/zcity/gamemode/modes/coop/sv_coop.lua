@@ -363,7 +363,7 @@ function MODE:GiveEquipment()
 
             local hasSavedData = false
             local savedData = nil
-            
+
             if hg.CoopPersistence and hg.CoopPersistence.GetPlayerData then
                 savedData = hg.CoopPersistence.GetPlayerData(ply:SteamID())
                 if savedData then
