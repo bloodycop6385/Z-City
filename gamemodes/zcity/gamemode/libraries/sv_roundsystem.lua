@@ -67,12 +67,11 @@ function zb:PreRound()
 		zb.END_TIME = nil
 
 		local isCoop = zb.nextround == "coop" or (CurrentRound() and CurrentRound().name == "coop")
-		local needsLongWait = isCoop and zb.coop_awaiting_players
-		local waitTime = needsLongWait and (GetConVar("zb_dev"):GetBool() and 5 or 120) or (CurrentRound().start_time or 5)
+		local waitTime = isCoop and 60 or (CurrentRound().start_time or 5)
 
 		if not zb.START_TIME then
 			zb.START_TIME = CurTime() + waitTime
-			if needsLongWait then
+			if isCoop then
 				SetGlobalVar("coop_first_round_timer", zb.START_TIME)
 			end
 		end
