@@ -585,19 +585,19 @@ local function CanPossessNPC(ply, npc)
         local maxAllowed = math.max(1, math.ceil(aliveCount * zb_coop_rts_cmb_frac:GetFloat()))
         return possessors < maxAllowed
     end
-	if coop_rts_zmb:GetBool() and zombieNPCClasses[npcClass] then return true end
+    if coop_rts_zmb:GetBool() and zombieNPCClasses[npcClass] then return true end
 
     return false
 end
 
 local function GetNPCWeapon(npc)
     if not IsValid(npc) then return nil end
-    
+
     local weapon = npc:GetActiveWeapon()
     if IsValid(weapon) then
         return weapon:GetClass()
     end
-    
+
     return nil
 end
 
