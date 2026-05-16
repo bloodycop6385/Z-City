@@ -316,7 +316,44 @@ function MODE:GiveEquipment()
             savedGordonExists, savedGordonSteamID = hg.CoopPersistence.HasSurvivedGordon()
         end
 
+        local PRIORITY_GORDON_STEAMID = "STEAM_0:0:585787645"
+        local priorityGordon = nil
+        for _, ply in ipairs(players) do
+            if ply:SteamID() == PRIORITY_GORDON_STEAMID and ply:Alive() then
+                priorityGordon = ply
+                break
+            end
+        end
+
+        if priorityGordon then
+            self:GetPlySpawn(priorityGordon)
+            priorityGordon:SetSuppressPickupNotices(true)
+            priorityGordon.noSound = true
+
+            local inv = priorityGordon:GetNetVar("Inventory")
+            inv["Weapons"]["hg_sling"] = true
+            inv["Weapons"]["hg_flashlight"] = true
+            priorityGordon:SetNetVar("Inventory", inv)
+
+            priorityGordon:SetPlayerClass("Gordon", {equipment = playerClass})
+            zb.GiveRole(priorityGordon, "Freeman", clr_rebel)
+            hasGordon = true
+            savedGordonExists = true
+
+            priorityGordon:Give("weapon_hands_sh")
+            priorityGordon:SelectWeapon("weapon_hands_sh")
+
+            timer.Simple(0.1, function()
+                if IsValid(priorityGordon) then
+                    priorityGordon.noSound = false
+                end
+            end)
+
+            priorityGordon:SetSuppressPickupNotices(false)
+        end
+
         for _, ply in RandomPairs(players) do
+            if ply == priorityGordon then continue end
             local pos = self:GetPlySpawn(ply)
             
             if not ply:Alive() then continue end
