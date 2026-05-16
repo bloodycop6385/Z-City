@@ -709,19 +709,63 @@ end)
 
 hook.Add("ZB_RoundStart", "RTSoff", function()
     if CurrentRound().name ~= "coop" then return end
-    
+
     for _, ply in player.Iterator() do
         ply.RTSUses = 0
+        ply.CombinePossessions = 0
     end
 end)
 
 hook.Add("PostCleanupMap", "RTScleanup", function()
     if CurrentRound().name ~= "coop" then return end
-    
+
     for _, ply in player.Iterator() do
         ply.RTSUses = 0
+        ply.CombinePossessions = 0
     end
 end)
+
+local zb_coop_respawn_wave = CreateConVar("zb_coop_respawn_wave", "120", FCVAR_SERVER_CAN_EXECUTE, "Seconds between respawn waves in Half-Life 2 CO-OP mode (0 to disable)", 0, 600)
+
+local function CoopRespawnWave()
+    if CurrentRound().name ~= "coop" then return end
+
+    local respawned = 0
+    for _, ply in player.Iterator() do
+        if ply:Alive() then continue end
+        ply:Spawn()
+        ApplyAppearance(ply)
+        ply:Give("weapon_hands_sh")
+        ply:SelectWeapon("weapon_hands_sh")
+        respawned = respawned + 1
+    end
+
+    if respawned > 0 then
+        PrintMessage(HUD_PRINTTALK, "[CO-OP] Respawn wave: "..respawned.." player(s) respawned.")
+    end
+end
+
+local function StartCoopRespawnWaves()
+    timer.Remove("CoopRespawnWave")
+    local interval = zb_coop_respawn_wave:GetInt()
+    if interval <= 0 then return end
+    if CurrentRound().name ~= "coop" then return end
+    timer.Create("CoopRespawnWave", interval, 0, CoopRespawnWave)
+end
+
+hook.Add("ZB_StartRound", "CoopRespawnWaveStart", function()
+    StartCoopRespawnWaves()
+end)
+
+hook.Add("ZB_EndRound", "CoopRespawnWaveStop", function()
+    timer.Remove("CoopRespawnWave")
+end)
+
+cvars.AddChangeCallback("zb_coop_respawn_wave", function()
+    if timer.Exists("CoopRespawnWave") or CurrentRound().name == "coop" then
+        StartCoopRespawnWaves()
+    end
+end, "CoopRespawnWaveRetune")
 
 hook.Add("OnEntityCreated", "CoopAlyxWeapon", function(ent)
     if CurrentRound().name ~= "coop" then return end
