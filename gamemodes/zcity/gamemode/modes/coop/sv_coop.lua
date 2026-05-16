@@ -747,19 +747,25 @@ hook.Add("PlayerButtonDown", "checks", function(ply, button)
     if not coop_rts:GetBool() then return end
     if ply:Alive() then return end
     if (ply.RTSUses or 0) >= zb_coop_maxpossesses:GetInt() and not ply:IsAdmin() then return end
-    
+
+    local cooldownRemaining = GetPossessCooldownRemaining(ply)
+    if cooldownRemaining > 0 then
+        NotifyPossessCooldown(ply, cooldownRemaining)
+        return
+    end
+
     local observeTarget = ply:GetObserverTarget()
     local searchPos
-    
+
     if IsValid(observeTarget) then
         searchPos = observeTarget:GetPos()
     else
         searchPos = ply:GetPos()
     end
-    
+
     local nearestNPC = nil
     local nearestDist = 300
-    
+
     for _, ent in ipairs(ents.FindInSphere(searchPos, nearestDist)) do
         if IsValid(ent) and ent:IsNPC() then
             local npcClass = ent:GetClass()
