@@ -807,6 +807,12 @@ local function CoopRespawnWave()
 
     if respawned > 0 then
         PrintMessage(HUD_PRINTTALK, "[CO-OP] Respawn wave: "..respawned.." player(s) respawned.")
+
+        for _, rag in ipairs(ents.FindByClass("prop_ragdoll")) do
+            if not IsValid(rag) then continue end
+            if IsValid(hg.RagdollOwner(rag)) then continue end
+            SafeRemoveEntity(rag)
+        end
     end
 end
 
@@ -903,6 +909,36 @@ hook.Add("ZB_StartRound", "CoopAntlionFriendly", function()
     if CurrentRound().name ~= "coop" then return end
     if not IsAntlionFriendlyMap() then return end
     timer.Simple(1, SyncAntlionFriendliness)
+end)
+
+MAX_COOP_CORPSES = 10
+
+local function CleanupOldestCorpses()
+    if CurrentRound().name ~= "coop" then return end
+
+    local ragdolls = ents.FindByClass("prop_ragdoll")
+    local corpses = {}
+    for _, rag in ipairs(ragdolls) do
+        if not IsValid(rag) then continue end
+        if IsValid(hg.RagdollOwner(rag)) then continue end
+        corpses[#corpses + 1] = rag
+    end
+
+    if #corpses <= MAX_COOP_CORPSES then return end
+
+    table.sort(corpses, function(a, b) return a:GetCreationID() < b:GetCreationID() end)
+
+    for i = 1, #corpses - MAX_COOP_CORPSES do
+        SafeRemoveEntity(corpses[i])
+    end
+end
+
+hook.Add("OnEntityCreated", "CoopCorpseCap", function(ent)
+    if not IsValid(ent) then return end
+    if ent:GetClass() ~= "prop_ragdoll" then return end
+    if CurrentRound().name ~= "coop" then return end
+
+    timer.Simple(0, CleanupOldestCorpses)
 end)
 
 hook.Add("OnEntityCreated", "CoopAlyxWeapon", function(ent)
