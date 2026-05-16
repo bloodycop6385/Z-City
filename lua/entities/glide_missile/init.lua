@@ -118,8 +118,13 @@ end
 
 function ENT:PhysicsCollide( data )
     -- Silently remove this missile when hitting the skybox
-    if data.TheirSurfaceProps == 76 then
+    if data.TheirSurfaceProps == 76 then -- default_silent
         self:Remove()
+        return
+    end
+
+    if data.TheirSurfaceProps == 77 then -- shared_impact
+        self:Explode()
         return
     end
 

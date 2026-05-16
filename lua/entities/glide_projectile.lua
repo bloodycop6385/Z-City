@@ -218,10 +218,16 @@ function ENT:Think()
 end
 
 function ENT:PhysicsCollide( data )
-    if data.TheirSurfaceProps == 76 then
+    if data.TheirSurfaceProps == 76 then -- default_silent
         self:Remove()
         return
     end
+
+    if data.TheirSurfaceProps == 77 then -- shared_impact
+        self:Explode()
+        return
+    end
+
     self:Explode()
 end
 

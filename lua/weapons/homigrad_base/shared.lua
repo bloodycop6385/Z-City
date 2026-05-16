@@ -182,10 +182,18 @@ function SWEP:Initialize()
 end
 
 function SWEP:PhysicsCollide(ent, data)
-	if !self.CantFireFromCollision and (!self.lastshotfromhit or (self.lastshotfromhit + 0.5 < CurTime())) and data.Speed > 250 and math.random(45) == 1 then
-		self:PrimaryAttack()
-		self.lastshotfromhit = CurTime()
-	end
+    if data.TheirSurfaceProps == 76 then -- default_silent
+        return
+    end
+
+    if data.TheirSurfaceProps == 77 then -- shared_impact
+        return
+    end
+
+    if !self.CantFireFromCollision and (!self.lastshotfromhit or (self.lastshotfromhit + 0.5 < CurTime())) and data.Speed > 250 and math.random(45) == 1 then
+        self:PrimaryAttack()
+        self.lastshotfromhit = CurTime()
+    end
 end
 
 SWEP.WepSelectIcon2 = Material("null")

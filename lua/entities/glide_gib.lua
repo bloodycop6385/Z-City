@@ -142,6 +142,14 @@ end
 local PlaySoundSet = Glide.PlaySoundSet
 
 function ENT:PhysicsCollide( data, _phys )
+    if data.TheirSurfaceProps == 76 then -- default_silent
+        return
+    end
+
+    if data.TheirSurfaceProps == 77 then -- shared_impact
+        return
+    end
+
     local speed = data.Speed
 
     if speed > 80 then

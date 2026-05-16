@@ -158,6 +158,10 @@ function ENT:PhysicsCollide( data )
         return
     end
 
+    if data.TheirSurfaceProps == 77 then -- shared_impact
+        return
+    end
+
     local velocityChange = data.OurNewVelocity - data.OurOldVelocity
     local surfaceNormal = data.HitNormal
 
