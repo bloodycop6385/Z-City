@@ -669,30 +669,35 @@ local function PossessNPC(ply, npc)
         npcModel = string.lower(npc:GetModel() or "")
         npcSkin = npc:GetSkin() or 0
     end
-	local isZombie = zombieNPCClasses[npcClass]
-    
+    local isZombie = zombieNPCClasses[npcClass]
+
     local currentMap = game.GetMap()
     local mapData = CurrentRound().Maps[currentMap] or {PlayerEqipment = "rebel"}
     local playerClass = mapData.PlayerEqipment
-    
+
     npc:Remove()
-    
+
     ply:Spawn()
     ply:SetPos(npcPos)
     ply:SetEyeAngles(Angle(0, npcAngles.y, 0))
     ply:SetHealth(math.max(npcHealth, 50))
-    
+
     ply.RTSUses = (ply.RTSUses or 0) + 1
     if isCombine then
         ply.CombinePossessions = (ply.CombinePossessions or 0) + 1
     end
 
+    local cooldown = zb_coop_possess_cooldown:GetFloat()
+    if cooldown > 0 then
+        ply.NextCoopPossessTime = CurTime() + cooldown
+    end
+
     timer.Simple(0, function()
         if not IsValid(ply) then return end
-        
+
         ply:SetSuppressPickupNotices(true)
         ply.noSound = true
-        
+
         local inv = ply:GetNetVar("Inventory")
         if inv then
             inv["Weapons"] = inv["Weapons"] or {}
