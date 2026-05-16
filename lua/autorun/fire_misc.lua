@@ -1128,7 +1128,7 @@ Specifics & External Support
 	---------------------------------------------------------------------------]]--
 	if CLIENT then
 		local map = game.GetMap()
-		local isHL2Map = string.StartWith(map, "d1_") or string.StartWith(map, "d2_") or string.StartWith(map, "d3_")
+		local isHL2Map = string.StartWith(map, "d1_") or string.StartWith(map, "d2_") or string.StartWith(map, "d3_") or string.StartWith(map, "gmhl2_")
 		if isHL2Map then
 			vFireLightMul = vFireLightMul * 0.165
 		end
