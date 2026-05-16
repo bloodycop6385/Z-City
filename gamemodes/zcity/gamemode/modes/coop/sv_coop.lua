@@ -373,24 +373,24 @@ function MODE:GiveEquipment()
 
             if hasSavedData and savedData then
                 local restored, data = hg.CoopPersistence.RestorePlayerData(ply)
-                
+
                 if restored and data then
                     local savedPlayerClass = data.PlayerClass
                     local savedRole = data.Role
                     local savedRoleColor = data.RoleColor and Color(data.RoleColor[1], data.RoleColor[2], data.RoleColor[3]) or clr_rebel
                     local savedSubClass = data.SubClass
-                    
-                    
+
+
                     if savedPlayerClass == "Gordon" or savedRole == "Freeman" then
-                       
+
                         ply:SetPlayerClass("Gordon", {bRestored = true})
                         zb.GiveRole(ply, "Freeman", clr_rebel)
                         hasGordon = true
                     elseif savedSubClass == "medic" then
                         ply.subClass = "medic"
                         medicCount = medicCount + 1
-                        
-                        
+
+
                         if savedPlayerClass == "Refugee" then
                             ply:SetPlayerClass("Refugee", {bNoEquipment = true})
                         else
@@ -400,8 +400,8 @@ function MODE:GiveEquipment()
                     elseif savedSubClass == "grenadier" then
                         ply.subClass = "grenadier"
                         grenadierCount = grenadierCount + 1
-                        
-                        
+
+
                         if savedPlayerClass == "Refugee" then
                             ply:SetPlayerClass("Refugee", {bNoEquipment = true})
                         else
@@ -410,8 +410,8 @@ function MODE:GiveEquipment()
                         zb.GiveRole(ply, "Grenadier", clr_grenadier)
                     else
                         ply.subClass = nil
-                        
-                        
+
+
                         if savedPlayerClass == "Refugee" then
                             ply:SetPlayerClass("Refugee", {bNoEquipment = true})
                             zb.GiveRole(ply, savedRole or "Refugee", savedRoleColor)
@@ -420,7 +420,7 @@ function MODE:GiveEquipment()
                             zb.GiveRole(ply, savedRole or "Rebel", savedRoleColor)
                         end
                     end
-                    
+
                     hg.CoopPersistence.MarkPlayerRestored(ply:SteamID())
                 else
                     self:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxMedics, savedGordonExists)
@@ -453,7 +453,7 @@ function MODE:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxM
     local wasGordon = false
     local wasMedic = false
     local wasGrenadier = false
-    
+
     local inv = ply:GetNetVar("Inventory")
     inv["Weapons"]["hg_sling"] = true
     inv["Weapons"]["hg_flashlight"] = true
@@ -504,7 +504,7 @@ function MODE:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxM
             zb.GiveRole(ply, "Rebel", clr_rebel)
         end
     end
-    
+
     return wasGordon, wasMedic, wasGrenadier
 end
 
@@ -523,7 +523,7 @@ function MODE:CanSpawn()
 end
 
 function MODE:CanLaunch()
-	local triggers = ents.FindByClass( "trigger_changelevel" )
+    local triggers = ents.FindByClass( "trigger_changelevel" )
     return #triggers > 0 and IsValid(triggers[1])
 end
 
