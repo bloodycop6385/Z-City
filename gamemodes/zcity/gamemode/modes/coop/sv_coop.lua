@@ -542,6 +542,21 @@ local zombieNPCClasses = {
 
 local zb_coop_maxpossesses = ConVarExists("zb_coop_maxpossesses") and GetConVar("zb_coop_maxpossesses") or CreateConVar("zb_coop_maxpossesses",3,FCVAR_SERVER_CAN_EXECUTE,"Max NPC possession amount in Half-Life 2 CO-OP round",1,100)
 local zb_coop_rts_cmb_frac = ConVarExists("zb_coop_rts_cmb_frac") and GetConVar("zb_coop_rts_cmb_frac") or CreateConVar("zb_coop_rts_cmb_frac","0.25",FCVAR_SERVER_CAN_EXECUTE,"Fraction of alive players allowed to possess combine NPCs in Half-Life 2 CO-OP round",0,1)
+local zb_coop_possess_cooldown = ConVarExists("zb_coop_possess_cooldown") and GetConVar("zb_coop_possess_cooldown") or CreateConVar("zb_coop_possess_cooldown", "300", FCVAR_SERVER_CAN_EXECUTE, "Seconds each player must wait between NPC possessions in Half-Life 2 CO-OP mode", 0, 1800)
+
+local function GetPossessCooldownRemaining(ply)
+    local cooldown = zb_coop_possess_cooldown:GetFloat()
+    if cooldown <= 0 then return 0 end
+
+    return math.max((ply.NextCoopPossessTime or 0) - CurTime(), 0)
+end
+
+local function NotifyPossessCooldown(ply, remaining)
+    if (ply.NextCoopPossessCooldownNotice or 0) > CurTime() then return end
+    ply.NextCoopPossessCooldownNotice = CurTime() + 1.5
+
+    ply:ChatPrint("[CO-OP] NPC possession is cooling down: " .. string.FormattedTime(remaining, "%02i:%02i") .. " remaining.")
+end
 
 local function CountCombinePossessors()
     local aliveCount, possessors = 0, 0
