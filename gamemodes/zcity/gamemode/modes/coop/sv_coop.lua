@@ -922,8 +922,15 @@ end
 local function StartCoopRespawnWaves()
     timer.Remove("CoopRespawnWave")
     local interval = zb_coop_respawn_wave:GetInt()
-    if interval <= 0 then return end
-    if CurrentRound().name ~= "coop" then return end
+    if interval <= 0 then
+        SetCoopRespawnWaveState(0, 0)
+        return
+    end
+    if CurrentRound().name ~= "coop" then
+        SetCoopRespawnWaveState(0, 0)
+        return
+    end
+    SetCoopRespawnWaveState(CurTime() + interval, interval)
     timer.Create("CoopRespawnWave", interval, 0, CoopRespawnWave)
 end
 
