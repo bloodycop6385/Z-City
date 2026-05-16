@@ -727,9 +727,70 @@ end)
 
 local zb_coop_respawn_wave = CreateConVar("zb_coop_respawn_wave", "120", FCVAR_SERVER_CAN_EXECUTE, "Seconds between respawn waves in Half-Life 2 CO-OP mode (0 to disable)", 0, 600)
 
+local function IsCoopAlly(ply)
+    if not IsValid(ply) or not ply:IsPlayer() then return false end
+    if not ply:Alive() then return false end
+    local class = ply.PlayerClassName
+    if class == "Combine" or class == "Metrocop" or class == "headcrabzombie" then return false end
+    return true
+end
+
+local function FindBiggestPlayerCluster(radius)
+    radius = radius or 1024
+    local rsq = radius * radius
+    local allies = {}
+    for _, ply in player.Iterator() do
+        if IsCoopAlly(ply) then allies[#allies + 1] = ply end
+    end
+    if #allies == 0 then return nil end
+
+    local bestPly, bestCount = allies[1], 0
+    for _, p in ipairs(allies) do
+        local count = 0
+        local pos = p:GetPos()
+        for _, q in ipairs(allies) do
+            if pos:DistToSqr(q:GetPos()) <= rsq then count = count + 1 end
+        end
+        if count > bestCount then
+            bestCount = count
+            bestPly = p
+        end
+    end
+    return bestPly
+end
+
+local function FindSpawnPosNear(anchor)
+    if not IsValid(anchor) then return nil end
+    local center = anchor:GetPos()
+    local hullMins, hullMaxs = Vector(-16, -16, 0), Vector(16, 16, 72)
+    for attempt = 1, 20 do
+        local angle = math.random() * math.pi * 2
+        local dist = math.random(96, 256)
+        local candidate = center + Vector(math.cos(angle) * dist, math.sin(angle) * dist, 16)
+        local groundTr = util.TraceLine({
+            start = candidate,
+            endpos = candidate - Vector(0, 0, 512),
+            mask = MASK_PLAYERSOLID,
+            filter = anchor,
+        })
+        if not groundTr.Hit or groundTr.HitSky or groundTr.StartSolid then continue end
+        local groundPos = groundTr.HitPos + Vector(0, 0, 4)
+        local clearance = util.TraceHull({
+            start = groundPos,
+            endpos = groundPos,
+            mins = hullMins,
+            maxs = hullMaxs,
+            mask = MASK_PLAYERSOLID,
+        })
+        if not clearance.Hit and not clearance.StartSolid then return groundPos end
+    end
+    return center
+end
+
 local function CoopRespawnWave()
     if CurrentRound().name ~= "coop" then return end
 
+    local anchor = FindBiggestPlayerCluster(1024)
     local respawned = 0
     for _, ply in player.Iterator() do
         if ply:Alive() then continue end
@@ -737,6 +798,10 @@ local function CoopRespawnWave()
         ApplyAppearance(ply)
         ply:Give("weapon_hands_sh")
         ply:SelectWeapon("weapon_hands_sh")
+        if IsValid(anchor) then
+            local pos = FindSpawnPosNear(anchor)
+            if pos then ply:SetPos(pos) end
+        end
         respawned = respawned + 1
     end
 
@@ -766,6 +831,79 @@ cvars.AddChangeCallback("zb_coop_respawn_wave", function()
         StartCoopRespawnWaves()
     end
 end, "CoopRespawnWaveRetune")
+
+local antlionFriendlyMaps = {
+    ["gmhl2_coast_12"] = true,
+    ["gmhl2_prison_part1"] = true,
+    ["gmhl2_prison_part2"] = true,
+    ["d2_coast_12"] = true,
+    ["d2_prison_01"] = true,
+    ["d2_prison_02"] = true,
+    ["d2_prison_03"] = true,
+    ["d2_prison_04"] = true,
+    ["d2_prison_05"] = true,
+    ["d2_prison_06"] = true,
+    ["d2_prison_07"] = true,
+    ["d2_prison_08"] = true,
+}
+
+local antlionClasses = {
+    ["npc_antlion"] = true,
+    ["npc_antlionguard"] = true,
+    ["npc_antlion_grub"] = true,
+    ["npc_antlion_worker"] = true,
+}
+
+local function IsAntlionFriendlyMap()
+    return antlionFriendlyMaps[game.GetMap()] == true
+end
+
+local function MakeAntlionFriendlyToPlayer(npc, ply)
+    if not IsValid(npc) or not IsValid(ply) then return end
+    if not antlionClasses[npc:GetClass()] then return end
+    npc:AddEntityRelationship(ply, D_LI, 99)
+    npc:ClearEnemyMemory()
+end
+
+local function SyncAntlionFriendliness()
+    if not IsAntlionFriendlyMap() then return end
+    for _, npc in ipairs(ents.FindByClass("npc_antlion*")) do
+        if not antlionClasses[npc:GetClass()] then continue end
+        for _, ply in player.Iterator() do
+            npc:AddEntityRelationship(ply, D_LI, 99)
+        end
+        npc:ClearEnemyMemory()
+    end
+end
+
+hook.Add("OnEntityCreated", "CoopAntlionFriendly", function(ent)
+    if CurrentRound().name ~= "coop" then return end
+    if not IsAntlionFriendlyMap() then return end
+    timer.Simple(0, function()
+        if not IsValid(ent) then return end
+        if not antlionClasses[ent:GetClass()] then return end
+        for _, ply in player.Iterator() do
+            MakeAntlionFriendlyToPlayer(ent, ply)
+        end
+    end)
+end)
+
+hook.Add("PlayerSpawn", "CoopAntlionFriendly", function(ply)
+    if CurrentRound().name ~= "coop" then return end
+    if not IsAntlionFriendlyMap() then return end
+    timer.Simple(0.1, function()
+        if not IsValid(ply) then return end
+        for _, npc in ipairs(ents.FindByClass("npc_antlion*")) do
+            MakeAntlionFriendlyToPlayer(npc, ply)
+        end
+    end)
+end)
+
+hook.Add("ZB_StartRound", "CoopAntlionFriendly", function()
+    if CurrentRound().name ~= "coop" then return end
+    if not IsAntlionFriendlyMap() then return end
+    timer.Simple(1, SyncAntlionFriendliness)
+end)
 
 hook.Add("OnEntityCreated", "CoopAlyxWeapon", function(ent)
     if CurrentRound().name ~= "coop" then return end
