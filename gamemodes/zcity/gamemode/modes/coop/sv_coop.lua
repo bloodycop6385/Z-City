@@ -101,32 +101,32 @@ MODE.LootTable = {
         {6,"ent_ammo_14.5x114mm"},
         {2,"weapon_hg_rpg"},
         {6,"ent_ammo_rpg7"},
-        
-        
 
 
-		{6,"ent_armor_vest3"},
-		{5,"ent_armor_helmet1"},
-		{5,"ent_armor_vest4"},
 
-		{5,"weapon_hg_molotov_tpik"},
-		{5,"weapon_hg_pipebomb_tpik"},
-		{5,"weapon_hg_hl2grenade"},
-		{5,"weapon_hg_slam"},
-	}},
+
+        {6,"ent_armor_vest3"},
+        {5,"ent_armor_helmet1"},
+        {5,"ent_armor_vest4"},
+
+        {5,"weapon_hg_molotov_tpik"},
+        {5,"weapon_hg_pipebomb_tpik"},
+        {5,"weapon_hg_hl2grenade"},
+        {5,"weapon_hg_slam"},
+    }},
 }
 
 local RemoveGordonWeapons = {
     ["weapon_hg_crowbar"] = true,
-	["weapon_pocketknife"] = true,
-	["weapon_hk_usp"] = true,
-	["weapon_revolver357"] = true,
-	["weapon_spas12"] = true,
-	["weapon_hg_crossbow"] = true,
-	["weapon_osipr"] = true,
-	["weapon_mp7"] = true,
-	["weapon_hg_slam"] = true,
-	["weapon_hg_rpg"] = true,
+    ["weapon_pocketknife"] = true,
+    ["weapon_hk_usp"] = true,
+    ["weapon_revolver357"] = true,
+    ["weapon_spas12"] = true,
+    ["weapon_hg_crossbow"] = true,
+    ["weapon_osipr"] = true,
+    ["weapon_mp7"] = true,
+    ["weapon_hg_slam"] = true,
+    ["weapon_hg_rpg"] = true,
     ["weapon_hg_hl2nade_tpik"] = true,
     ["weapon_bugbait"] = true,
     ["weapon_physcannon"] = true,
