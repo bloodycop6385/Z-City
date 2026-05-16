@@ -10,6 +10,7 @@ function CLASS.Off(self)
             v:AddEntityRelationship(self, D_LI, 0)
         end
     end
+    hook.Remove("OnEntityCreated", "rebel_relation_ship" .. self:EntIndex())
 end
 
 CLASS.CanUseDefaultPhrase = true
