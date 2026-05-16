@@ -1,4 +1,4 @@
-﻿AddCSLuaFile()
+AddCSLuaFile()
 --
 local surface_hardness = {
 	[MAT_METAL] = 1,
@@ -50,6 +50,7 @@ end
 local bulletHit
 local timer, util, math, IsValid, WorldToLocal, Vector, sound, EffectData, game = timer, util, math, IsValid, WorldToLocal, Vector, sound, EffectData, game
 local hg_bulletholes = CreateConVar("hg_bulletholes", "0", FCVAR_ARCHIVE + FCVAR_NOTIFY + FCVAR_REPLICATED, "Enable R6S bulletholes feature", 0, 1)
+local hg_hdImpactEffects = CLIENT and CreateClientConVar("hg_hd_impact_effects", "0", true, false, "Enable expensive HD bullet impact particles.")
 
 local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 	if CLIENT then return end
@@ -98,7 +99,7 @@ local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 		if Penetrated then
 			util.Decal("Impact.Concrete",SearchPos + dir*5, SearchPos - dir*15)
 			timer.Simple(0.15,function()
-				if effect[tr.MatType] then
+				if effect[tr.MatType] and hg_hdImpactEffects and hg_hdImpactEffects:GetBool() then
 					local effectdata2 = EffectData()
 					effectdata2:SetNormal(dir)
 					effectdata2:SetStart(hitPos + dir * 15)

@@ -370,7 +370,7 @@ if CLIENT then
 						button.Icon = button.Icon or (isstring(Icon) and Material(Icon)) or Icon -- Ну тут так, без выбора если что материал будет
 					end
 
-					if HaveIcon then
+					if HaveIcon and button.Icon then
 						if Overide and isnumber( Icon ) then
 							surface.SetTexture(button.Icon)
 						else

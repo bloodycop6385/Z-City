@@ -89,5 +89,9 @@ PrecacheParticleSystem("impact_glass")
 
 --// Fix for homigrad content breaking impact decals (bruh)
 if CLIENT then
-	RunConsoleCommand("cl_new_impact_effects", "1")
+    CreateClientConVar("hg_hd_impact_effects", "0", true, false, "Enable expensive HD bullet impact particles.")
+
+    -- The new impact effects are expensive enough to tank FPS when impacts stack.
+    -- Leave them opt-in through the client's own setting instead of forcing them.
+	RunConsoleCommand("cl_new_impact_effects", "0")
 end
