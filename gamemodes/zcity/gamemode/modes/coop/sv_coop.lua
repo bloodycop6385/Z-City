@@ -705,7 +705,7 @@ local function PossessNPC(ply, npc)
             inv["Weapons"]["hg_flashlight"] = true
             ply:SetNetVar("Inventory", inv)
         end
-        
+
         local loadout, modelOverride, skinOverride
         if isCombine then
             loadout, modelOverride, skinOverride = GetCombinePossessLoadout(npcClass, npcModel, npcSkin)
