@@ -841,12 +841,21 @@ end
 local function CoopRespawnWave()
     if CurrentRound().name ~= "coop" then return end
 
+    local mapData = CurrentRound().Maps[game.GetMap()] or {PlayerEqipment = "rebel"}
+    local playerClass = mapData.PlayerEqipment
+
     local anchor = FindBiggestPlayerCluster(1024)
     local respawned = 0
     for _, ply in player.Iterator() do
         if ply:Alive() then continue end
         ply:Spawn()
-        ApplyAppearance(ply)
+        if playerClass == "refugee" or playerClass == "citizen" then
+            ply:SetPlayerClass("Refugee", {bNoEquipment = playerClass == "citizen"})
+            zb.GiveRole(ply, "Refugee", clr_rebel)
+        else
+            ply:SetPlayerClass("Rebel")
+            zb.GiveRole(ply, "Rebel", clr_rebel)
+        end
         ply:Give("weapon_hands_sh")
         ply:SelectWeapon("weapon_hands_sh")
         if IsValid(anchor) then
