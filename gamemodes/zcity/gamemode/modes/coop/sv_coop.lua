@@ -737,7 +737,7 @@ local function PossessNPC(ply, npc)
             end
         end)
     end)
-    
+
     return true
 end
 
