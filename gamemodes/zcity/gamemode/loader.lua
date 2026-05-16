@@ -16,6 +16,8 @@ local function IncluderFunc(fileName)
 	end
 end
 
+IncluderFunc("zcity/cl_rndx.lua")
+
 --прошу обратить внимание что файлы внутри папок загружаются первыми
 local function LoadFromDir(directory)
 	local files, folders = file.Find(directory .. "/*", "LUA")
