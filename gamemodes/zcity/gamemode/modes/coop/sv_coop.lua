@@ -1054,19 +1054,19 @@ end)
 
 hook.Add("OnEntityCreated", "CoopAlyxWeapon", function(ent)
     if CurrentRound().name ~= "coop" then return end
-    
+
     timer.Simple(0, function()
         if not IsValid(ent) then return end
         if ent:GetClass() ~= "npc_alyx" then return end
-        
+
         timer.Simple(0.1, function()
             if not IsValid(ent) then return end
-            
+
             local currentWeapon = ent:GetActiveWeapon()
             if IsValid(currentWeapon) then
                 currentWeapon:Remove()
             end
-            
+
             ent:Give("weapon_pl15")
         end)
     end)
