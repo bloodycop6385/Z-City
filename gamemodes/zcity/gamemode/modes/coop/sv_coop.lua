@@ -41,7 +41,7 @@ end
 
 function MODE.GuiltCheck(Attacker, Victim, add, harm, amt)
     if !hg.FriendlyClasses[Attacker.PlayerClassName] or !hg.FriendlyClasses[Attacker.PlayerClassName][Victim.PlayerClassName] then return 0, false end
-	
+
     return 1.5, true
 end
 
