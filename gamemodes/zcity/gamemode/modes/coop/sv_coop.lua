@@ -244,7 +244,7 @@ function MODE:RoundStart()
                     ply:StripWeapon("weapon_bugbait")
                 end
 
-                if v:GetClass() == "weapon_physcannon" then 
+                if v:GetClass() == "weapon_physcannon" then
                     ply:StripWeapon("weapon_physcannon")
                 end
             end
