@@ -10,6 +10,14 @@ hg.NextMap = ""
 local coop_rts = CreateConVar("zb_coop_rts", "1", FCVAR_PROTECTED, "Toggle NPC rebel possess in Half-Life 2 CO-OP mode", 0, 1)
 local coop_rts_cmb = CreateConVar("zb_coop_rts_cmb", "1", FCVAR_PROTECTED, "Toggle NPC combine possess in Half-Life 2 CO-OP mode if zb_coop_rts is enabled", 0, 1)
 local coop_rts_zmb = CreateConVar("zb_coop_rts_zmb", "0", FCVAR_PROTECTED, "Toggle NPC zombie possess in Half-Life 2 CO-OP mode if zb_coop_rts is enabled", 0, 1) --!! WIP
+local zb_coop_join_grace = CreateConVar("zb_coop_join_grace", "60", FCVAR_SERVER_CAN_EXECUTE, "Seconds after a CO-OP round starts where waiting players spawn immediately instead of waiting for a respawn wave", 0, 600)
+
+local function IsCoopJoinGraceActive()
+    local round = CurrentRound and CurrentRound()
+    if not round or round.name ~= "coop" then return false end
+
+    return (round.CoopJoinGraceEnd or 0) > CurTime()
+end
 
 MODE.LootSpawn = false
 
@@ -231,6 +239,8 @@ function MODE:ShouldRoundEnd()
 end
 
 function MODE:RoundStart()
+    self.CoopJoinGraceEnd = CurTime() + zb_coop_join_grace:GetFloat()
+
     for _, ply in player.Iterator() do
         if ply.PlayerClassName == "Gordon" then
             for k, ent in ipairs(ents.FindInSphere( ply:GetPos(), 512 )) do
@@ -519,7 +529,8 @@ end
 function MODE:RoundThink()
 end
 
-function MODE:CanSpawn()
+function MODE:CanSpawn(ply)
+    if IsValid(ply) and ply:Team() ~= TEAM_SPECTATOR and IsCoopJoinGraceActive() then return true end
 end
 
 function MODE:CanLaunch()
@@ -872,6 +883,37 @@ local function FindSpawnPosNear(anchor)
     return center
 end
 
+local function RespawnCoopPlayer(ply, anchor)
+    if not IsValid(ply) or ply:Alive() then return false end
+    if ply:Team() == TEAM_SPECTATOR then return false end
+
+    local mapData = CurrentRound().Maps[game.GetMap()] or {PlayerEqipment = "rebel"}
+    local playerClass = mapData.PlayerEqipment
+
+    ply:Spawn()
+    if not ply:Alive() then return false end
+
+    ply:SetTeam(0)
+
+    if playerClass == "refugee" or playerClass == "citizen" then
+        ply:SetPlayerClass("Refugee", {bNoEquipment = playerClass == "citizen"})
+        zb.GiveRole(ply, "Refugee", clr_rebel)
+    else
+        ply:SetPlayerClass("Rebel")
+        zb.GiveRole(ply, "Rebel", clr_rebel)
+    end
+
+    ply:Give("weapon_hands_sh")
+    ply:SelectWeapon("weapon_hands_sh")
+
+    if IsValid(anchor) then
+        local pos = FindSpawnPosNear(anchor)
+        if pos then ply:SetPos(pos) end
+    end
+
+    return true
+end
+
 local function CoopRespawnWave()
     if CurrentRound().name ~= "coop" then
         SetCoopRespawnWaveState(0, 0)
@@ -883,29 +925,10 @@ local function CoopRespawnWave()
         SetCoopRespawnWaveState(CurTime() + interval, interval)
     end
 
-    local mapData = CurrentRound().Maps[game.GetMap()] or {PlayerEqipment = "rebel"}
-    local playerClass = mapData.PlayerEqipment
-
     local anchor = FindBiggestPlayerCluster(1024)
     local respawned = 0
     for _, ply in player.Iterator() do
-        if ply:Team() == TEAM_SPECTATOR then continue end
-        if ply:Alive() then continue end
-        ply:Spawn()
-        if playerClass == "refugee" or playerClass == "citizen" then
-            ply:SetPlayerClass("Refugee", {bNoEquipment = playerClass == "citizen"})
-            zb.GiveRole(ply, "Refugee", clr_rebel)
-        else
-            ply:SetPlayerClass("Rebel")
-            zb.GiveRole(ply, "Rebel", clr_rebel)
-        end
-        ply:Give("weapon_hands_sh")
-        ply:SelectWeapon("weapon_hands_sh")
-        if IsValid(anchor) then
-            local pos = FindSpawnPosNear(anchor)
-            if pos then ply:SetPos(pos) end
-        end
-        respawned = respawned + 1
+        if RespawnCoopPlayer(ply, anchor) then respawned = respawned + 1 end
     end
 
     if respawned > 0 then
@@ -948,6 +971,18 @@ cvars.AddChangeCallback("zb_coop_respawn_wave", function()
         StartCoopRespawnWaves()
     end
 end, "CoopRespawnWaveRetune")
+
+local nextCoopJoinGraceCheck = 0
+hook.Add("Think", "CoopJoinGraceRespawn", function()
+    if not IsCoopJoinGraceActive() then return end
+    if nextCoopJoinGraceCheck > CurTime() then return end
+    nextCoopJoinGraceCheck = CurTime() + 0.5
+
+    local anchor = FindBiggestPlayerCluster(1024)
+    for _, ply in player.Iterator() do
+        RespawnCoopPlayer(ply, anchor)
+    end
+end)
 
 local antlionFriendlyMaps = {
     ["gmhl2_coast_12"] = true,
