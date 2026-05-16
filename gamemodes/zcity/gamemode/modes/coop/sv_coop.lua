@@ -184,7 +184,7 @@ end
 function MODE:Intermission()
     self.LootTimer = CurTime() + 2
     game.CleanUpMap()
-    
+
 
     self.COOPPoints = zb.GetMapPoints("HMCD_COOP_SPAWN")
 
