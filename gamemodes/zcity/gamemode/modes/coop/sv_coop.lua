@@ -223,7 +223,7 @@ function MODE:ShouldRoundEnd()
             if hg.CoopPersistence and hg.CoopPersistence.SaveAllPlayers then
                 hg.CoopPersistence.SaveAllPlayers()
             end
-            
+
             RunConsoleCommand("changelevel", hg.NextMap)
         end)
     end
