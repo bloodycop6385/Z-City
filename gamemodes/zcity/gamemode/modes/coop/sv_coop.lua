@@ -873,7 +873,15 @@ local function FindSpawnPosNear(anchor)
 end
 
 local function CoopRespawnWave()
-    if CurrentRound().name ~= "coop" then return end
+    if CurrentRound().name ~= "coop" then
+        SetCoopRespawnWaveState(0, 0)
+        return
+    end
+
+    local interval = zb_coop_respawn_wave:GetInt()
+    if interval > 0 then
+        SetCoopRespawnWaveState(CurTime() + interval, interval)
+    end
 
     local mapData = CurrentRound().Maps[game.GetMap()] or {PlayerEqipment = "rebel"}
     local playerClass = mapData.PlayerEqipment
