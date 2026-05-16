@@ -34,7 +34,7 @@ local rebels = {
 
 function CLASS.Off(self)
     if CLIENT then return end
-    
+
     for k,v in ipairs(ents.FindByClass("npc_*")) do
         if table.HasValue(rebels,v:GetClass()) then
             v:AddEntityRelationship( self, D_HT, 99 )
@@ -42,6 +42,7 @@ function CLASS.Off(self)
             v:AddEntityRelationship( self, D_LI, 0 )
         end
     end
+    hook.Remove("OnEntityCreated", "refugee_relation_ship" .. self:EntIndex())
 end
 
 CLASS.CanUseDefaultPhrase = true
