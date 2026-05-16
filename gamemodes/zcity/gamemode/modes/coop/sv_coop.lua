@@ -541,6 +541,16 @@ local zombieNPCClasses = {
 }
 
 local zb_coop_maxpossesses = ConVarExists("zb_coop_maxpossesses") and GetConVar("zb_coop_maxpossesses") or CreateConVar("zb_coop_maxpossesses",3,FCVAR_SERVER_CAN_EXECUTE,"Max NPC possession amount in Half-Life 2 CO-OP round",1,100)
+local zb_coop_rts_cmb_frac = ConVarExists("zb_coop_rts_cmb_frac") and GetConVar("zb_coop_rts_cmb_frac") or CreateConVar("zb_coop_rts_cmb_frac","0.25",FCVAR_SERVER_CAN_EXECUTE,"Fraction of alive players allowed to possess combine NPCs in Half-Life 2 CO-OP round",0,1)
+
+local function CountCombinePossessors()
+    local aliveCount, possessors = 0, 0
+    for _, p in player.Iterator() do
+        if p:Alive() then aliveCount = aliveCount + 1 end
+        if (p.CombinePossessions or 0) > 0 then possessors = possessors + 1 end
+    end
+    return aliveCount, possessors
+end
 
 local function CanPossessNPC(ply, npc)
     if not IsValid(ply) or not IsValid(npc) then return false end
@@ -551,7 +561,14 @@ local function CanPossessNPC(ply, npc)
 
     local npcClass = npc:GetClass()
     if friendlyNPCClasses[npcClass] then return true end
-    if coop_rts_cmb:GetBool() and combineNPCClasses[npcClass] then return true end
+    if coop_rts_cmb:GetBool() and combineNPCClasses[npcClass] then
+        if ply:IsAdmin() then return true end
+        if (ply.CombinePossessions or 0) > 0 then return true end
+
+        local aliveCount, possessors = CountCombinePossessors()
+        local maxAllowed = math.max(1, math.ceil(aliveCount * zb_coop_rts_cmb_frac:GetFloat()))
+        return possessors < maxAllowed
+    end
 	if coop_rts_zmb:GetBool() and zombieNPCClasses[npcClass] then return true end
 
     return false
@@ -592,7 +609,10 @@ local function PossessNPC(ply, npc)
     ply:SetHealth(math.max(npcHealth, 50))
     
     ply.RTSUses = (ply.RTSUses or 0) + 1
-    
+    if isCombine then
+        ply.CombinePossessions = (ply.CombinePossessions or 0) + 1
+    end
+
     timer.Simple(0, function()
         if not IsValid(ply) then return end
         
