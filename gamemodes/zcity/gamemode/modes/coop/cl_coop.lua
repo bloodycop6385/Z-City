@@ -258,8 +258,9 @@ end
 
 local function DrawStatusBanner(ply, target, stats, alpha)
     local isSpectator = ply:Team() == TEAM_SPECTATOR
-    local statusText = isSpectator and "SPECTATOR" or "YOU DIED"
-    local statusColor = isSpectator and statusSpectator or statusDead
+    local completed = ply:GetNWBool("CoopMapCompleted", false)
+    local statusText = isSpectator and "SPECTATOR" or (completed and "MAP COMPLETE" or "YOU DIED")
+    local statusColor = isSpectator and statusSpectator or (completed and statusAlive or statusDead)
     local bannerW = math.Clamp(sw * 0.50, 680, 920)
     local bannerH = ScreenScaleH(54)
     local x = sw * 0.5 - bannerW * 0.5
@@ -286,7 +287,7 @@ local function DrawStatusBanner(ply, target, stats, alpha)
     local counts = stats.alive .. " alive  " .. stats.waiting .. " waiting  " .. stats.spectators .. " spectators"
     surface.SetFont("ZB_CoopHUDSmall")
     local countsW = surface.GetTextSize(counts)
-    local detail = isSpectator and targetText or ("Respawn wave in " .. waveText .. " | " .. targetText)
+    local detail = isSpectator and targetText or (completed and ("Waiting for team to reach the exit | " .. targetText) or ("Respawn wave in " .. waveText .. " | " .. targetText))
     local detailMaxW = bannerW - countsW - ScreenScale(44)
     detail = FitText(detail, "ZB_CoopHUDSmall", detailMaxW)
 

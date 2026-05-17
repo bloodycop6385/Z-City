@@ -45,8 +45,9 @@ function ENT:StartTouch( ent )
 		end
 	
 		-- Freeze them and make sure they don't push people away
+		ent:SetNWBool("CoopMapCompleted", true)
         ent:KillSilent()
-	
+
 		hg.MapCompleted = true
 		hg.NextMap = self.map or ""
 	end
