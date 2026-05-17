@@ -691,4 +691,4 @@ function RNDX.SetDefaultShape(shape)
     DEFAULT_DRAW_FLAGS = DEFAULT_SHAPE
 end
 
-marauth.render = RNDX
+_G.RNDX = RNDX
