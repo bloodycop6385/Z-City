@@ -186,7 +186,10 @@ end
 local function GetPlayerState(ply)
     if not IsValid(ply) then return "Gone", hudMuted end
     if ply:Team() == TEAM_SPECTATOR then return "Spectator", statusSpectator end
-    if not ply:Alive() then return "Dead", statusDead end
+    if not ply:Alive() then
+        if ply:GetNWBool("CoopMapCompleted", false) then return "At Exit", statusAlive end
+        return "Dead", statusDead
+    end
     if ply.organism and ply.organism.incapacitated then return "Down", statusDown end
     if coopEnemyClasses[ply.PlayerClassName or ""] then return "Possessed", GetRoleColor(ply) end
 
