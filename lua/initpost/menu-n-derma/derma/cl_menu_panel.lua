@@ -141,8 +141,8 @@ function PANEL:Init()
     self.lDock = vgui.Create("DPanel", self)
     local lDock = self.lDock
     lDock:Dock(LEFT)
-    lDock:SetSize(ScrW() / 4, ScrH())
-    lDock:DockMargin(ScreenScale(0), ScreenScaleH(90), ScreenScale(10), ScreenScaleH(90))
+    lDock:SetSize(ScrW(), ScrH())
+    lDock:DockMargin(0, ScreenScaleH(90), ScreenScale(10), ScreenScaleH(90))
     lDock.Paint = function(this, w, h)
         if hg.PluvTown.Active then
             surface.SetDrawColor(color_white)
@@ -166,6 +166,7 @@ function PANEL:Init()
     self.panelparrent = vgui.Create("DPanel", self)
     self.panelparrent:SetPos(bottomDock:GetWide() + bottomDock:GetX(), 0)
     self.panelparrent:SetSize(ScrW() - bottomDock:GetWide() * 1, ScrH())
+    self.panelparrent:SetZPos(32767)
     self.panelparrent.Paint = function(this, w, h) end
     local git = vgui.Create("DLabel", bottomDock)
     git:Dock(BOTTOM)
