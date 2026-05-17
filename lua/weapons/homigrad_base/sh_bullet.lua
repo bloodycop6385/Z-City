@@ -50,7 +50,7 @@ end
 local bulletHit
 local timer, util, math, IsValid, WorldToLocal, Vector, sound, EffectData, game = timer, util, math, IsValid, WorldToLocal, Vector, sound, EffectData, game
 local hg_bulletholes = CreateConVar("hg_bulletholes", "0", FCVAR_ARCHIVE + FCVAR_NOTIFY + FCVAR_REPLICATED, "Enable R6S bulletholes feature", 0, 1)
-local hg_hdImpactEffects = CLIENT and CreateClientConVar("hg_hd_impact_effects", "0", true, false, "Enable expensive HD bullet impact particles.")
+local hg_hdImpactEffects = CreateConVar("hg_hd_impact_effects", "0", FCVAR_ARCHIVE + FCVAR_NOTIFY + FCVAR_REPLICATED, "Enable expensive HD bullet impact particles.", 0, 1)
 
 local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 	if CLIENT then return end

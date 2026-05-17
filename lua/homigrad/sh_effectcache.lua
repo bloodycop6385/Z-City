@@ -88,10 +88,9 @@ PrecacheParticleSystem("impact_wood")
 PrecacheParticleSystem("impact_glass")
 
 --// Fix for homigrad content breaking impact decals (bruh)
+-- hg_hd_impact_effects is a replicated convar declared in homigrad_base/sh_bullet.lua;
+-- the per-impact zippy_impact_* path is server-side, so the gate has to be server-set.
 if CLIENT then
-    CreateClientConVar("hg_hd_impact_effects", "0", true, false, "Enable expensive HD bullet impact particles.")
-
     -- The new impact effects are expensive enough to tank FPS when impacts stack.
-    -- Leave them opt-in through the client's own setting instead of forcing them.
 	RunConsoleCommand("cl_new_impact_effects", "0")
 end
