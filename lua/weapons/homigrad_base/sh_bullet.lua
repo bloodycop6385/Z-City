@@ -60,7 +60,12 @@ local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 	if bullet.penetrated > 6 then return end
 	if bullet.limit_ricochet > 6 then return end
 	if tr.Entity.organism then return end
-	
+
+	-- Shrapnel fires hundreds of bullets per explosion. Skip the fan-out
+	-- effects (recursive FireLuaBullets, tracers, ricochet sound/decal,
+	-- bullet drop spark) so they don't tank client FPS for minutes.
+	local isShrapnel = bullet.IsShrapnel
+
 	local dir, hitNormal, hitPos = tr.Normal, tr.HitNormal, tr.HitPos
 	local hardness = surface_hardness[tr.MatType] or 0.5
 	local ApproachAngle = -math.deg(math.asin(hitNormal:DotProduct(dir)))
@@ -98,8 +103,11 @@ local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 
 		if Penetrated then
 			util.Decal("Impact.Concrete",SearchPos + dir*5, SearchPos - dir*15)
+
+			if isShrapnel then return end
+
 			timer.Simple(0.15,function()
-				if effect[tr.MatType] and hg_hdImpactEffects and hg_hdImpactEffects:GetBool() then
+				if effect[tr.MatType] and hg_hdImpactEffects:GetBool() then
 					local effectdata2 = EffectData()
 					effectdata2:SetNormal(dir)
 					effectdata2:SetStart(hitPos + dir * 15)
@@ -214,6 +222,7 @@ local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 			end)
 		end
 	elseif ApproachAngle < MaxRicAngle * 0.7 then --previosly 0.2, made 1 for fun
+		if isShrapnel then return end
 		--if CLIENT then return end
 		-- ping whiiiizzzz
 		local rnd = math.random(12)
@@ -265,6 +274,7 @@ local function callbackBullet(self, tr, dmg, force, bullet, penetration)
 			util.Effect("eff_tracer", effectdata1)
 		end)
 	elseif math.random(2) == 1 then
+		if isShrapnel then return end
 		if CLIENT then return end
 		local effectdata1 = EffectData()
 		effectdata1:SetOrigin(hitPos)
