@@ -55,6 +55,7 @@ function ENT:ActivateExplosive()
 	bullet.Attacker = self.owner
 	bullet.Distance = 56756
 	bullet.Callback = hg.bulletHit
+	bullet.IsShrapnel = true
 	bullet.Tracer = 10000
 	bullet.DisableLagComp = true
 	bullet.Filter = {self}

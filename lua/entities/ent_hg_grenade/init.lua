@@ -369,6 +369,7 @@ function ENT:Explode()
 						bullet.Filter = {self}
 						bullet.Dir = dir
 						bullet.Callback = hg.bulletHit
+						bullet.IsShrapnel = true
 
 						self:FireLuaBullets(bullet, true)
 					end
