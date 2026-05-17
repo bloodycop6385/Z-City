@@ -1,6 +1,6 @@
 local PANEL = {}
 local curent_panel
-local red_select = Color(192, 0, 0)
+local red_select = Color(0, 192, 64)
 DISCORD_URL = "https://discord.gg/MpWHkcqzyB"
 local Selects = {
     {
@@ -113,16 +113,16 @@ function PANEL:InitializeMarkup()
     if prefix then mapname = string.sub(mapname, prefix + 1) end
     local gm = splasheh[math.random(#splasheh)] .. " | " .. string.NiceName(mapname)
     if hg.PluvTown.Active then
-        local text = "<font=ZC_MM_Title><colour=199,2,2>    </colour>City</font>\n<font=ZCity_Tiny><colour=105,105,105>" .. gm .. "</colour></font>"
+        local text = "<font=ZC_MM_Title><colour=0,199,64>Riggs'</colour> Bike Club</font>\n<font=ZCity_Tiny><colour=105,105,105>" .. gm .. "</colour></font>"
         self.SelectedPluv = table.Random(hg.PluvTown.PluvMats)
         return markup.Parse(text)
     end
 
-    local text = "<font=ZC_MM_Title><colour=199,2,2,255>Z</colour>-City</font>\n<font=ZCity_Tiny><colour=105,105,105>" .. gm .. "</colour></font>"
+    local text = "<font=ZC_MM_Title><colour=0,199,64,255>Riggs'</colour> Bike Club</font>\n<font=ZCity_Tiny><colour=105,105,105>" .. gm .. "</colour></font>"
     return markup.Parse(text)
 end
 
-local color_red = Color(255, 25, 25, 45)
+local color_red = Color(25, 255, 80, 45)
 local clr_gray = Color(255, 255, 255, 25)
 local clr_verygray = Color(10, 10, 19, 235)
 function PANEL:Init()
@@ -205,7 +205,7 @@ end
 local gradient_d = surface.GetTextureID("vgui/gradient-d")
 local gradient_r = surface.GetTextureID("vgui/gradient-u")
 local gradient_l = surface.GetTextureID("vgui/gradient-l")
-local clr_1 = Color(102, 0, 0, 35)
+local clr_1 = Color(0, 102, 30, 35)
 function PANEL:Paint(w, h)
     draw.RoundedBox(0, 0, 0, w, h, self.ColorBG)
     hg.DrawBlur(self, 5)
