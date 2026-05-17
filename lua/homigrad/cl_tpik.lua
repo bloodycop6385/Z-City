@@ -1066,6 +1066,10 @@ function hg.DoTPIK(ply, ent)
             ply.segmentsr = segments
         end
 
+        if not segments[3] then
+            segments[3] = {Pos = ply_r_hand_matrix:GetTranslation(), Len = 12}
+        end
+
         local new = -(-segments[3].Pos)
 
         ply_r_upperarm_matrix:SetTranslation(segments[1].Pos)
@@ -1200,6 +1204,10 @@ function hg.DoTPIK(ply, ent)
             end]]
             
             ply.segmentsl = segments
+        end
+
+        if not segments[3] then
+            segments[3] = {Pos = ply_l_hand_matrix:GetTranslation(), Len = 12}
         end
 
         local new = -(-segments[3].Pos)

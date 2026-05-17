@@ -883,12 +883,24 @@ local function FindSpawnPosNear(anchor)
     return center
 end
 
-local function RespawnCoopPlayer(ply, anchor)
+local function IsCoopMedicAlive()
+    for _, ply in player.Iterator() do
+        if not IsValid(ply) then continue end
+        if ply:Team() == TEAM_SPECTATOR then continue end
+        if not ply:Alive() then continue end
+        if ply.subClass == "medic" then return true end
+    end
+    return false
+end
+
+local function RespawnCoopPlayer(ply, anchor, forceMedic)
     if not IsValid(ply) or ply:Alive() then return false end
     if ply:Team() == TEAM_SPECTATOR then return false end
 
     local mapData = CurrentRound().Maps[game.GetMap()] or {PlayerEqipment = "rebel"}
     local playerClass = mapData.PlayerEqipment
+
+    ply.subClass = forceMedic and "medic" or nil
 
     ply:Spawn()
     if not ply:Alive() then return false end
@@ -897,9 +909,15 @@ local function RespawnCoopPlayer(ply, anchor)
 
     if playerClass == "refugee" or playerClass == "citizen" then
         ply:SetPlayerClass("Refugee", {bNoEquipment = playerClass == "citizen"})
-        zb.GiveRole(ply, "Refugee", clr_rebel)
     else
         ply:SetPlayerClass("Rebel")
+    end
+
+    if forceMedic then
+        zb.GiveRole(ply, "Medic", clr_medic)
+    elseif playerClass == "refugee" or playerClass == "citizen" then
+        zb.GiveRole(ply, "Refugee", clr_rebel)
+    else
         zb.GiveRole(ply, "Rebel", clr_rebel)
     end
 
@@ -926,9 +944,14 @@ local function CoopRespawnWave()
     end
 
     local anchor = FindBiggestPlayerCluster(1024)
+    local needsMedic = not IsCoopMedicAlive()
     local respawned = 0
     for _, ply in player.Iterator() do
-        if RespawnCoopPlayer(ply, anchor) then respawned = respawned + 1 end
+        local forceMedic = needsMedic
+        if RespawnCoopPlayer(ply, anchor, forceMedic) then
+            respawned = respawned + 1
+            if forceMedic then needsMedic = false end
+        end
     end
 
     if respawned > 0 then

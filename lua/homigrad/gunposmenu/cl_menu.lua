@@ -1,7 +1,7 @@
 
 
-local red = Color(75,25,25)
-local redselected = Color(150,0,0)
+local red = Color(25,75,35)
+local redselected = Color(0,150,50)
 
 local blurMat = Material("pp/blurscreen")
 local Dynamic = 0

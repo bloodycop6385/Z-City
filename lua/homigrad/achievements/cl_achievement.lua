@@ -16,7 +16,7 @@ local gradient_u = Material("vgui/gradient-u")
 gradient_r = Material("vgui/gradient-r")
 
 local function PaintButton(self,w,h)
-    surface.SetDrawColor(155, 0, 0, 108)
+    surface.SetDrawColor(0, 155, 50, 108)
     surface.SetMaterial(gradient_l)
     surface.DrawTexturedRect( 0, 0, w, h )
 end
@@ -298,7 +298,7 @@ hook.Add("HUDPaint","hg_NewAchievement", function()
         local HPos = ScrH() - ( HSize * ach.Lerp )
         draw.RoundedBox( 0, 2, HPos + 2, WSize - 4, HSize - 4, ach_clr2 )
 		
-		surface.SetDrawColor(155, 0, 0, 255)
+		surface.SetDrawColor(0, 155, 50, 255)
 		surface.SetMaterial(gradient_u)
 		surface.DrawTexturedRect( 0, HPos, WSize, HSize )
 	

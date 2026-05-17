@@ -427,8 +427,8 @@ hook.Add("InitPostEntity", "furryhuy", function()
 end)
 
 local colGray = Color(122,122,122,255)
-local colBlue = Color(130,10,10)
-local colBlueUp = Color(160,30,30)
+local colBlue = Color(10,110,40)
+local colBlueUp = Color(30,150,60)
 local col = Color(255,255,255,255)
 
 local colSpect1 = Color(75,75,75,255)
@@ -599,7 +599,7 @@ function GM:ScoreboardShow()
 	local ServerName = GetHostName() or "ZCity | Developer Server | #01"
 	local tick
 	scoreBoardMenu.PaintOver = function(self,w,h)
-		surface.SetDrawColor( 255, 0, 0, 128)
+		surface.SetDrawColor( 0, 200, 80, 128)
         surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
 
 		surface.SetFont( "ZB_InterfaceLarge" )
@@ -648,7 +648,7 @@ function GM:ScoreboardShow()
 		end
 
 		SPECTATE.Paint = function(self,w,h)
-			surface.SetDrawColor( 255, 0, 0, 128)
+			surface.SetDrawColor( 0, 200, 80, 128)
 			surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
 			surface.SetFont( "ZB_InterfaceMedium" )
 			surface.SetTextColor(col.r,col.g,col.b,col.a)
@@ -673,7 +673,7 @@ function GM:ScoreboardShow()
 		end
 
 		PLAYING.Paint = function(self,w,h)
-			surface.SetDrawColor( 255, 0, 0, 128)
+			surface.SetDrawColor( 0, 200, 80, 128)
 			surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
 			surface.SetFont( "ZB_InterfaceMedium" )
 			surface.SetTextColor(col.r,col.g,col.b,col.a)
@@ -694,7 +694,7 @@ function GM:ScoreboardShow()
 		surface.SetDrawColor(0, 0, 0, 125)
 		surface.DrawRect(0, 0, w, h)
 
-		surface.SetDrawColor( 255, 0, 0, 128)
+		surface.SetDrawColor( 0, 200, 80, 128)
         surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
 	end
 
@@ -771,7 +771,7 @@ function GM:ScoreboardShow()
 		surface.SetDrawColor(0, 0, 0, 125)
 		surface.DrawRect(0, 0, w, h)
 
-		surface.SetDrawColor( 255, 0, 0, 128)
+		surface.SetDrawColor( 0, 200, 80, 128)
         surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
 	end
 

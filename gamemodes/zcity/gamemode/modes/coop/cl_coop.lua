@@ -105,22 +105,20 @@ local function FitText(text, font, maxWidth)
 end
 
 local function DrawPanel(x, y, w, h, alpha)
-    draw.RoundedBox(8, x, y, w, h, Color(0, 0, 0, alpha * 0.28))
-    draw.RoundedBox(8, x, y, w, h, Color(hudPanel.r, hudPanel.g, hudPanel.b, alpha * 0.86))
+    RNDX.Draw(8, x, y, w, h, Color(0, 0, 0, alpha * 0.28))
+    RNDX.Draw(8, x, y, w, h, Color(hudPanel.r, hudPanel.g, hudPanel.b, alpha * 0.86))
 
     surface.SetMaterial(gradientRight)
     surface.SetDrawColor(hudPanel2.r, hudPanel2.g, hudPanel2.b, alpha * 0.42)
     surface.DrawTexturedRect(x, y, w, h)
 
-    surface.SetDrawColor(hudLine.r, hudLine.g, hudLine.b, alpha * 0.72)
-    surface.DrawOutlinedRect(x, y, w, h, 1)
+    RNDX.DrawOutlined(8, x, y, w, h, Color(hudLine.r, hudLine.g, hudLine.b, alpha * 0.72), 1)
 end
 
 local function DrawPill(x, y, w, h, col, alpha)
-    draw.RoundedBox(6, x, y, w, h, Color(0, 0, 0, alpha * 0.24))
-    draw.RoundedBox(6, x, y, w, h, Color(col.r, col.g, col.b, alpha * 0.24))
-    surface.SetDrawColor(col.r, col.g, col.b, alpha * 0.84)
-    surface.DrawOutlinedRect(x, y, w, h, 1)
+    RNDX.Draw(6, x, y, w, h, Color(0, 0, 0, alpha * 0.24))
+    RNDX.Draw(6, x, y, w, h, Color(col.r, col.g, col.b, alpha * 0.24))
+    RNDX.DrawOutlined(6, x, y, w, h, Color(col.r, col.g, col.b, alpha * 0.84), 1)
 end
 
 local function DrawReloadHint(x, y, maxW, alpha)
@@ -140,7 +138,7 @@ local function DrawReloadHint(x, y, maxW, alpha)
     DrawPill(x, y, hintW, hintH, hudLine, alpha * (0.72 + pulse * 0.18))
     DrawShadowText("Press", "ZB_CoopHUDSmall", cursorX, centerY, AlphaColor(hudText, alpha * 0.9), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
     cursorX = cursorX + pressW + gap
-    draw.RoundedBox(4, cursorX, y + ScreenScaleH(3), keyW, hintH - ScreenScaleH(6), Color(hudLine.r, hudLine.g, hudLine.b, alpha * (0.24 + pulse * 0.12)))
+    RNDX.Draw(4, cursorX, y + ScreenScaleH(3), keyW, hintH - ScreenScaleH(6), Color(hudLine.r, hudLine.g, hudLine.b, alpha * (0.24 + pulse * 0.12)))
     DrawShadowText("R", "ZB_CoopHUDSmall", cursorX + keyW * 0.5, centerY, AlphaColor(hudText, alpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     cursorX = cursorX + keyW + gap
     DrawShadowText(tailText, "ZB_CoopHUDSmall", cursorX, centerY, AlphaColor(hudText, alpha * 0.9), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
@@ -273,7 +271,7 @@ local function DrawStatusBanner(ply, target, stats, alpha)
     surface.SetDrawColor(statusColor.r, statusColor.g, statusColor.b, alpha * 0.25 * pulse)
     surface.DrawTexturedRect(x, y, bannerW, bannerH)
 
-    draw.RoundedBox(4, x + ScreenScale(5), y + ScreenScaleH(8), ScreenScale(2), bannerH - ScreenScaleH(16), AlphaColor(statusColor, alpha))
+    RNDX.Draw(2, x + ScreenScale(5), y + ScreenScaleH(8), ScreenScale(2), bannerH - ScreenScaleH(16), AlphaColor(statusColor, alpha))
 
     DrawShadowText(statusText, "ZB_CoopHUDStatus", x + ScreenScale(12), y + ScreenScaleH(9), AlphaColor(statusColor, alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
@@ -327,8 +325,10 @@ local function DrawGameStatePanel(stats, alpha)
     local barY = y + panelH - ScreenScaleH(27)
     local barW = panelW - ScreenScale(20)
     local barH = ScreenScaleH(6)
-    draw.RoundedBox(4, barX, barY, barW, barH, Color(0, 0, 0, alpha * 0.34))
-    draw.RoundedBox(4, barX, barY, barW * waveProgress, barH, AlphaColor(hudLine, alpha))
+    RNDX.Draw(barH * 0.5, barX, barY, barW, barH, Color(0, 0, 0, alpha * 0.34))
+    if waveProgress > 0 then
+        RNDX.Draw(barH * 0.5, barX, barY, barW * waveProgress, barH, AlphaColor(hudLine, alpha))
+    end
 
     DrawShadowText("Next respawn wave", "ZB_CoopHUDSmall", barX, barY - ScreenScaleH(5), AlphaColor(hudMuted, alpha), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
     DrawShadowText(waveText, "ZB_CoopHUDText", barX + barW, barY - ScreenScaleH(5), AlphaColor(hudText, alpha), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
@@ -367,8 +367,8 @@ local function DrawRoster(alpha)
         local roleName = GetRoleName(ply)
         local roleColor = GetRoleColor(ply)
 
-        draw.RoundedBox(4, x + ScreenScale(7), rowY + ScreenScaleH(2), panelW - ScreenScale(14), rowH - ScreenScaleH(4), Color(0, 0, 0, rowAlpha * 0.20))
-        draw.RoundedBox(4, x + ScreenScale(7), rowY + ScreenScaleH(2), ScreenScale(3), rowH - ScreenScaleH(4), AlphaColor(roleColor, rowAlpha))
+        RNDX.Draw(4, x + ScreenScale(7), rowY + ScreenScaleH(2), panelW - ScreenScale(14), rowH - ScreenScaleH(4), Color(0, 0, 0, rowAlpha * 0.20))
+        RNDX.Draw(2, x + ScreenScale(7), rowY + ScreenScaleH(2), ScreenScale(3), rowH - ScreenScaleH(4), AlphaColor(roleColor, rowAlpha))
 
         local innerX = x + ScreenScale(16)
         local innerW = panelW - ScreenScale(28)
@@ -407,8 +407,8 @@ local function DrawRadar(target, alpha)
     local worldScale = 2200
     local sweep = math.rad((CurTime() * 95) % 360)
 
-    draw.RoundedBox(radius, x, y, size, size, Color(0, 0, 0, alpha * 0.36))
-    draw.RoundedBox(radius, x + 1, y + 1, size - 2, size - 2, Color(hudBg.r, hudBg.g, hudBg.b, alpha * 0.82))
+    RNDX.Draw(radius, x, y, size, size, Color(0, 0, 0, alpha * 0.36), RNDX.SHAPE_CIRCLE)
+    RNDX.Draw(radius, x + 1, y + 1, size - 2, size - 2, Color(hudBg.r, hudBg.g, hudBg.b, alpha * 0.82), RNDX.SHAPE_CIRCLE)
 
     surface.DrawCircle(cx, cy, radius * 0.33, 255, 255, 255, alpha * 0.07)
     surface.DrawCircle(cx, cy, radius * 0.66, 255, 255, 255, alpha * 0.07)
@@ -449,8 +449,8 @@ local function DrawRadar(target, alpha)
         local bx = cx + hud.radar[key].x
         local by = cy + hud.radar[key].y
 
-        draw.RoundedBox(blipSize, bx - blipSize, by - blipSize, blipSize * 2, blipSize * 2, Color(0, 0, 0, alpha * 0.55))
-        draw.RoundedBox(blipSize, bx - blipSize + 1, by - blipSize + 1, blipSize * 2 - 2, blipSize * 2 - 2, AlphaColor(roleColor, alpha))
+        RNDX.Draw(blipSize, bx - blipSize, by - blipSize, blipSize * 2, blipSize * 2, Color(0, 0, 0, alpha * 0.55), RNDX.SHAPE_CIRCLE)
+        RNDX.Draw(blipSize, bx - blipSize + 1, by - blipSize + 1, blipSize * 2 - 2, blipSize * 2 - 2, AlphaColor(roleColor, alpha), RNDX.SHAPE_CIRCLE)
 
         if ply == target then
             surface.DrawCircle(bx, by, blipSize + 4, roleColor.r, roleColor.g, roleColor.b, alpha * 0.85)
@@ -485,7 +485,7 @@ local function DrawWorldMarkers(target, alpha)
         DrawPill(x, y, w, ScreenScaleH(17), roleColor, hud.marker[key])
         DrawShadowText(label, "ZB_CoopHUDSmall", screen.x, y + ScreenScaleH(8), AlphaColor(hudText, hud.marker[key]), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-        draw.RoundedBox(8, screen.x - 3, y + ScreenScaleH(22), 6, 6, AlphaColor(roleColor, hud.marker[key]))
+        RNDX.Draw(3, screen.x - 3, y + ScreenScaleH(22), 6, 6, AlphaColor(roleColor, hud.marker[key]), RNDX.SHAPE_CIRCLE)
         if ply == target then
             DrawShadowText("TARGET", "ZB_CoopHUDSmall", screen.x, y - ScreenScaleH(4), AlphaColor(hudLine, hud.marker[key]), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
         elseif stateText ~= "Alive" then
@@ -549,8 +549,8 @@ net.Receive("coop_roundend",function()
 end)
 
 local colGray = Color(85,85,85,255)
-local colRed = Color(130,10,10)
-local colRedUp = Color(160,30,30)
+local colRed = Color(10,110,40)
+local colRedUp = Color(30,150,60)
 
 local colBlue = Color(10,10,160)
 local colBlueUp = Color(40,40,160)
@@ -629,7 +629,7 @@ CreateEndMenu = function()
     DScrollPanel:SetSize(sizeX - 20, sizeY - 90)
     function DScrollPanel:Paint( w, h )
 
-        surface.SetDrawColor( 255, 0, 0, 128)
+        surface.SetDrawColor( 0, 200, 80, 128)
         surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
     end
 

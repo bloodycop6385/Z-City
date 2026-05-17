@@ -20,11 +20,11 @@ BlurBackground = hg.DrawBlur
 
 local function PaintFrame(self,w,h)
 	BlurBackground(self)
-    surface.SetDrawColor(155, 0, 0, 155)
+    surface.SetDrawColor(0, 155, 50, 155)
     surface.SetMaterial(gradient_u)
     surface.DrawTexturedRect( 0, 0, w, h )
 
-	surface.SetDrawColor( 255, 0, 0, 128)
+	surface.SetDrawColor( 0, 200, 80, 128)
     surface.DrawOutlinedRect( 0, 0, w, h, 2.5 )
 end
 

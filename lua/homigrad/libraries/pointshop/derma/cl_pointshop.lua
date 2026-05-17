@@ -43,7 +43,7 @@ local PLUGIN = hg.PointShop
 local PANEL = {}
 
 local color_blacky = Color(15,15,15,254)
-local color_reddy = Color(155,0,0,100)
+local color_reddy = Color(0,155,50,100)
 local gradientUp = surface.GetTextureID("vgui/gradient-d")
 local gradient_r = surface.GetTextureID("vgui/gradient-r")
 
