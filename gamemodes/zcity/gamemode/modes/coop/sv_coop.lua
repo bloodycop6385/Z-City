@@ -362,100 +362,107 @@ function MODE:GiveEquipment()
             priorityGordon:SetSuppressPickupNotices(false)
         end
 
+        local stagger = 0
         for _, ply in RandomPairs(players) do
             if ply == priorityGordon then continue end
-            local pos = self:GetPlySpawn(ply)
-
-            if not ply:Alive() then continue end
-
-            ply:SetSuppressPickupNotices(true)
-            ply.noSound = true
-
-            local hasSavedData = false
-            local savedData = nil
-
-            if hg.CoopPersistence and hg.CoopPersistence.GetPlayerData then
-                savedData = hg.CoopPersistence.GetPlayerData(ply:SteamID())
-                if savedData then
-                    hasSavedData = true
-                end
-            end
-
-            if hasSavedData and savedData then
-                local restored, data = hg.CoopPersistence.RestorePlayerData(ply)
-
-                if restored and data then
-                    local savedPlayerClass = data.PlayerClass
-                    local savedRole = data.Role
-                    local savedRoleColor = data.RoleColor and Color(data.RoleColor[1], data.RoleColor[2], data.RoleColor[3]) or clr_rebel
-                    local savedSubClass = data.SubClass
-
-
-                    if savedPlayerClass == "Gordon" or savedRole == "Freeman" then
-
-                        ply:SetPlayerClass("Gordon", {bRestored = true})
-                        zb.GiveRole(ply, "Freeman", clr_rebel)
-                        hasGordon = true
-                    elseif savedSubClass == "medic" then
-                        ply.subClass = "medic"
-                        medicCount = medicCount + 1
-
-
-                        if savedPlayerClass == "Refugee" then
-                            ply:SetPlayerClass("Refugee", {bNoEquipment = true})
-                        else
-                            ply:SetPlayerClass(savedPlayerClass or "Rebel", {bNoEquipment = true})
-                        end
-                        zb.GiveRole(ply, "Medic", clr_medic)
-                    elseif savedSubClass == "grenadier" then
-                        ply.subClass = "grenadier"
-                        grenadierCount = grenadierCount + 1
-
-
-                        if savedPlayerClass == "Refugee" then
-                            ply:SetPlayerClass("Refugee", {bNoEquipment = true})
-                        else
-                            ply:SetPlayerClass(savedPlayerClass or "Rebel", {bNoEquipment = true})
-                        end
-                        zb.GiveRole(ply, "Grenadier", clr_grenadier)
-                    else
-                        ply.subClass = nil
-
-
-                        if savedPlayerClass == "Refugee" then
-                            ply:SetPlayerClass("Refugee", {bNoEquipment = true})
-                            zb.GiveRole(ply, savedRole or "Refugee", savedRoleColor)
-                        else
-                            ply:SetPlayerClass(savedPlayerClass or "Rebel", {bNoEquipment = true})
-                            zb.GiveRole(ply, savedRole or "Rebel", savedRoleColor)
-                        end
-                    end
-
-                    hg.CoopPersistence.MarkPlayerRestored(ply:SteamID())
-                else
-                    self:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxMedics, savedGordonExists)
-                    if not hasGordon and not ply:IsBot() and not savedGordonExists then
-                        hasGordon = true
-                    elseif medicCount < maxMedics then
-                        medicCount = medicCount + 1
-                    end
-                end
-            else
-                local wasGordon, wasMedic, wasGrenadier = self:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxMedics, grenadierCount, maxGrenadier, savedGordonExists)
-                if wasGordon then hasGordon = true end
-                if wasMedic then medicCount = medicCount + 1 end
-                if wasGrenadier then grenadierCount = grenadierCount + 1 end
-            end
-
-            local hands = ply:Give("weapon_hands_sh")
-            ply:SelectWeapon("weapon_hands_sh")
-
-            timer.Simple(0.1, function()
+            stagger = stagger + 1
+            local delay = stagger * 0.15
+            timer.Simple(delay, function()
                 if not IsValid(ply) then return end
-                ply.noSound = false
-            end)
+                if ply:Team() == TEAM_SPECTATOR then return end
 
-            ply:SetSuppressPickupNotices(false)
+                local pos = self:GetPlySpawn(ply)
+                if not ply:Alive() then return end
+
+                ply:SetSuppressPickupNotices(true)
+                ply.noSound = true
+
+                local hasSavedData = false
+                local savedData = nil
+
+                if hg.CoopPersistence and hg.CoopPersistence.GetPlayerData then
+                    savedData = hg.CoopPersistence.GetPlayerData(ply:SteamID())
+                    if savedData then
+                        hasSavedData = true
+                    end
+                end
+
+                if hasSavedData and savedData then
+                    local restored, data = hg.CoopPersistence.RestorePlayerData(ply)
+
+                    if restored and data then
+                        local savedPlayerClass = data.PlayerClass
+                        local savedRole = data.Role
+                        local savedRoleColor = data.RoleColor and Color(data.RoleColor[1], data.RoleColor[2], data.RoleColor[3]) or clr_rebel
+                        local savedSubClass = data.SubClass
+
+
+                        if savedPlayerClass == "Gordon" or savedRole == "Freeman" then
+
+                            ply:SetPlayerClass("Gordon", {bRestored = true})
+                            zb.GiveRole(ply, "Freeman", clr_rebel)
+                            hasGordon = true
+                        elseif savedSubClass == "medic" then
+                            ply.subClass = "medic"
+                            medicCount = medicCount + 1
+
+
+                            if savedPlayerClass == "Refugee" then
+                                ply:SetPlayerClass("Refugee", {bNoEquipment = true})
+                            else
+                                ply:SetPlayerClass(savedPlayerClass or "Rebel", {bNoEquipment = true})
+                            end
+                            zb.GiveRole(ply, "Medic", clr_medic)
+                        elseif savedSubClass == "grenadier" then
+                            ply.subClass = "grenadier"
+                            grenadierCount = grenadierCount + 1
+
+
+                            if savedPlayerClass == "Refugee" then
+                                ply:SetPlayerClass("Refugee", {bNoEquipment = true})
+                            else
+                                ply:SetPlayerClass(savedPlayerClass or "Rebel", {bNoEquipment = true})
+                            end
+                            zb.GiveRole(ply, "Grenadier", clr_grenadier)
+                        else
+                            ply.subClass = nil
+
+
+                            if savedPlayerClass == "Refugee" then
+                                ply:SetPlayerClass("Refugee", {bNoEquipment = true})
+                                zb.GiveRole(ply, savedRole or "Refugee", savedRoleColor)
+                            else
+                                ply:SetPlayerClass(savedPlayerClass or "Rebel", {bNoEquipment = true})
+                                zb.GiveRole(ply, savedRole or "Rebel", savedRoleColor)
+                            end
+                        end
+
+                        hg.CoopPersistence.MarkPlayerRestored(ply:SteamID())
+                    else
+                        self:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxMedics, savedGordonExists)
+                        if not hasGordon and not ply:IsBot() and not savedGordonExists then
+                            hasGordon = true
+                        elseif medicCount < maxMedics then
+                            medicCount = medicCount + 1
+                        end
+                    end
+                else
+                    local wasGordon, wasMedic, wasGrenadier = self:GiveDefaultEquipment(ply, playerClass, hasGordon, medicCount, maxMedics, grenadierCount, maxGrenadier, savedGordonExists)
+                    if wasGordon then hasGordon = true end
+                    if wasMedic then medicCount = medicCount + 1 end
+                    if wasGrenadier then grenadierCount = grenadierCount + 1 end
+                end
+
+                local hands = ply:Give("weapon_hands_sh")
+                ply:SelectWeapon("weapon_hands_sh")
+
+                timer.Simple(0.1, function()
+                    if not IsValid(ply) then return end
+                    ply.noSound = false
+                end)
+
+                ply:SetSuppressPickupNotices(false)
+            end)
         end
     end)
 end
