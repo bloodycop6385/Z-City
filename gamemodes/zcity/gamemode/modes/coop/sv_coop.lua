@@ -451,6 +451,7 @@ function MODE:GiveEquipment()
             ply:SelectWeapon("weapon_hands_sh")
 
             timer.Simple(0.1, function()
+                if not IsValid(ply) then return end
                 ply.noSound = false
             end)
 
