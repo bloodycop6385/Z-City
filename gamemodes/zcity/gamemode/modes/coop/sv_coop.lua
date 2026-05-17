@@ -566,7 +566,7 @@ local function NotifyPossessCooldown(ply, remaining)
     if (ply.NextCoopPossessCooldownNotice or 0) > CurTime() then return end
     ply.NextCoopPossessCooldownNotice = CurTime() + 1.5
 
-    ply:ChatPrint("[CO-OP] NPC possession is cooling down: " .. string.FormattedTime(remaining, "%02i:%02i") .. " remaining.")
+    ply:ChatPrint("NPC possession is cooling down: " .. string.FormattedTime(remaining, "%02i:%02i") .. " remaining.")
 end
 
 local function CountCombinePossessors()
@@ -932,7 +932,7 @@ local function CoopRespawnWave()
     end
 
     if respawned > 0 then
-        PrintMessage(HUD_PRINTTALK, "[CO-OP] Respawn wave: " .. respawned .. " player(s) respawned.")
+        PrintMessage(HUD_PRINTTALK, "Respawn wave: " .. respawned .. " player(s) respawned.")
 
         for _, rag in ipairs(ents.FindByClass("prop_ragdoll")) do
             if not IsValid(rag) then continue end
