@@ -37,6 +37,42 @@ if (CLIENT) then
     	zb.net[net.ReadUInt(16)] = nil
     end)
 
+    net.Receive("zbSyncBatch", function()
+    	local kind = net.ReadUInt(2)
+    	local count = net.ReadUInt(16)
+    	for i = 1, count do
+    		if kind == 3 then
+    			local index = net.ReadUInt(16)
+    			local key = net.ReadString()
+    			local var = net.ReadType()
+
+    			zb.net[index] = zb.net[index] or {}
+    			zb.net[index][key] = var
+
+    			if IsValid(Entity(index)) then
+    				hook.Run("OnNetVarSet", index, key, var)
+    			else
+    				zb.net[index].waiting = true
+    			end
+    		elseif kind == 1 then
+    			local key = net.ReadString()
+    			local var = net.ReadType()
+
+    			zb.net.globals[key] = var
+    			hook.Run("OnGlobalVarSet", key, var)
+    		elseif kind == 2 then
+    			local key = net.ReadString()
+    			local var = net.ReadType()
+
+    			local idx = LocalPlayer():EntIndex()
+    			zb.net[idx] = zb.net[idx] or {}
+    			zb.net[idx][key] = var
+
+    			hook.Run("OnLocalVarSet", key, var)
+    		end
+    	end
+    end)
+
     net.Receive("zbLocalVarSet", function()
     	local key = net.ReadString()
     	local var = net.ReadType()
@@ -89,7 +125,8 @@ else
 	hook.Add("OnRequestFullUpdate", "OnRequestFullUpdate_zb", function(data)
 		local id = data.userid
 		local ply = Player(id)
-		
+
+		if not IsValid(ply) then return end
 		ply:SyncVars()
 	end)
 	
@@ -106,6 +143,7 @@ else
     util.AddNetworkString("zbLocalVarSet")
     util.AddNetworkString("zbNetVarSet")
     util.AddNetworkString("zbNetVarDelete")
+    util.AddNetworkString("zbSyncBatch")
 
     local function CheckBadType(name, object)
 		return false
