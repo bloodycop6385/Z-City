@@ -183,36 +183,123 @@ else
     	end
     end
 	
-    function playerMeta:SyncVars()
-    	for k, v in pairs(zb.net.globals) do
-    		net.Start("zbGlobalVarSet")
-    			net.WriteString(k)
-    			net.WriteType(v)
-    		net.Send(self)
+    -- Chunked, paced full-sync to avoid overflowing the reliable buffer
+    -- (the per-message limit is ~64 KB and the per-client reliable buffer
+    -- is 256 KB; firing a separate net.Send per netvar pegged it during
+    -- round restarts when game.CleanUpMap triggers OnRequestFullUpdate
+    -- for every player at once).
+    local SYNC_CHUNK_BYTES = 24 * 1024
+    local SYNC_QUEUE = SYNC_QUEUE or {}
+
+    local function syncEstimateValueBytes(v)
+    	local t = TypeID(v)
+    	if t == TYPE_STRING then
+    		return #v + 4
+    	elseif t == TYPE_TABLE then
+    		local ok, json = pcall(util.TableToJSON, v)
+    		return ok and #json + 8 or 256
+    	elseif t == TYPE_VECTOR or t == TYPE_ANGLE then
+    		return 16
+    	elseif t == TYPE_BOOL then
+    		return 2
     	end
+    	return 16
+    end
 
-    	for k, v in pairs(zb.net.locals[self] or {}) do
-    		net.Start("zbLocalVarSet")
-    			net.WriteString(k)
-    			net.WriteType(v)
-    		net.Send(self)
-    	end
-
-    	for entity, data in pairs(zb.net.list) do
-    		if (IsValid(entity)) then
-    			local index = entity:EntIndex()
-
-    			for k, v in pairs(data) do
-    				net.Start("zbNetVarSet")
-    					net.WriteUInt(index, 16)
-    					net.WriteString(k)
-    					net.WriteType(v)
-    				net.Send(self)
-    			end
-			else
-				zb.net.list[entity] = nil
+    local function syncFlushChunk(ply, kind, chunk)
+    	if #chunk == 0 then return end
+    	net.Start("zbSyncBatch")
+    	net.WriteUInt(kind, 2)
+    	net.WriteUInt(#chunk, 16)
+    	for i = 1, #chunk do
+    		local entry = chunk[i]
+    		if kind == 3 then
+    			net.WriteUInt(entry[1], 16)
+    			net.WriteString(entry[2])
+    			net.WriteType(entry[3])
+    		else
+    			net.WriteString(entry[1])
+    			net.WriteType(entry[2])
     		end
     	end
+    	net.Send(ply)
+    end
+
+    local function syncEnqueueChunks(ply, kind, entries)
+    	if #entries == 0 then return end
+    	SYNC_QUEUE[ply] = SYNC_QUEUE[ply] or {}
+    	local queue = SYNC_QUEUE[ply]
+
+    	local chunk = {}
+    	local chunkBytes = 0
+    	for i = 1, #entries do
+    		local entry = entries[i]
+    		local size
+    		if kind == 3 then
+    			size = 2 + #entry[2] + 1 + syncEstimateValueBytes(entry[3])
+    		else
+    			size = #entry[1] + 1 + syncEstimateValueBytes(entry[2])
+    		end
+
+    		if chunkBytes + size > SYNC_CHUNK_BYTES and #chunk > 0 then
+    			queue[#queue + 1] = { kind = kind, entries = chunk }
+    			chunk = {}
+    			chunkBytes = 0
+    		end
+    		chunk[#chunk + 1] = entry
+    		chunkBytes = chunkBytes + size
+    	end
+    	if #chunk > 0 then
+    		queue[#queue + 1] = { kind = kind, entries = chunk }
+    	end
+    end
+
+    hook.Add("Tick", "ZB_SyncBatchPacer", function()
+    	for ply, queue in pairs(SYNC_QUEUE) do
+    		if not IsValid(ply) then
+    			SYNC_QUEUE[ply] = nil
+    		elseif #queue == 0 then
+    			SYNC_QUEUE[ply] = nil
+    		else
+    			local job = table.remove(queue, 1)
+    			syncFlushChunk(ply, job.kind, job.entries)
+    		end
+    	end
+    end)
+
+    hook.Add("PlayerDisconnected", "ZB_SyncBatchPacer_Cleanup", function(ply)
+    	SYNC_QUEUE[ply] = nil
+    end)
+
+    function playerMeta:SyncVars()
+    	self.lastSyncVars = self.lastSyncVars or 0
+    	if self.lastSyncVars > CurTime() - 0.5 then return end
+    	self.lastSyncVars = CurTime()
+
+    	local globalEntries = {}
+    	for k, v in pairs(zb.net.globals) do
+    		globalEntries[#globalEntries + 1] = { k, v }
+    	end
+    	syncEnqueueChunks(self, 1, globalEntries)
+
+    	local localEntries = {}
+    	for k, v in pairs(zb.net.locals[self] or {}) do
+    		localEntries[#localEntries + 1] = { k, v }
+    	end
+    	syncEnqueueChunks(self, 2, localEntries)
+
+    	local entEntries = {}
+    	for entity, data in pairs(zb.net.list) do
+    		if IsValid(entity) then
+    			local index = entity:EntIndex()
+    			for k, v in pairs(data) do
+    				entEntries[#entEntries + 1] = { index, k, v }
+    			end
+    		else
+    			zb.net.list[entity] = nil
+    		end
+    	end
+    	syncEnqueueChunks(self, 3, entEntries)
     end
 	
     function playerMeta:GetLocalVar(key, default)
