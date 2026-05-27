@@ -1,4 +1,4 @@
-local MODE = MODE
+ylocal MODE = MODE
 
 MODE.KillMoney = 1000
 MODE.StartMoney = 1000
@@ -13,17 +13,7 @@ MODE.ForBigMaps = false -- if it can launch, then it doesn't really matter
 MODE.CooldownRounds = 5 -- 5 rounds of cs, 5 rounds without cs (at least 5)
 
 function MODE:ChanceFunction(info)
-    if info.rounds then
-        for i = #info.rounds, #info.rounds - self.CooldownRounds + 1, -1 do
-            if info.rounds[i] == self.name then
-                return 0
-            else
-                continue
-            end
-        end
-    end
-
-    return zb.ModesChances["cstrike"] or self.Chance
+    return 0
 end
 
 util.AddNetworkString("zb_cs_round_intermission")
