@@ -12,9 +12,7 @@ MODE.ForBigMaps = false -- if it can launch, then it doesn't really matter
 
 MODE.CooldownRounds = 5 -- 5 rounds of cs, 5 rounds without cs (at least 5)
 
-function MODE:ChanceFunction(info)
-    return 0
-end
+MODE.Chance = 0.00
 
 util.AddNetworkString("zb_cs_round_intermission")
 
