@@ -1084,13 +1084,17 @@ function SWEP:HomelanderSuperFlyingOnHit(trace)
         damage = flightDamage,
         force = 300000,
         upForce = 200,
+        shakeAmplitude = 25,
+        shakeFrequency = 100,
+        shakeDuration = 1,
+        shakeRadius = 1500,
         propDestroyRadius = propDestroyRadius,
         propScatterRadius = propScatterRadius,
         propScatterForce = propScatterForce,
         propDamage = propDamage,
         onBreakProp = playHomelanderPropBreakSound,
         isBlockedEntity = function(ent)
-            return self:IsGrabbedEntity(ent)
+            return ent == owner or self:IsGrabbedEntity(ent)
         end,
         scaleDamage = function(ent, amount)
             return isHomelanderCombatant(ent) and (amount * 0.1) or amount
