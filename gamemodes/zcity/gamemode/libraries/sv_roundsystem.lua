@@ -455,7 +455,9 @@ function zb.RerollChances()
 
 	local chances = zb.GetModesChances()
 
-	for i = 1, 20 do
+	local count = math.Clamp(player.GetCount() * 6, 20, 120)
+
+	for i = 1, count do
 		local round = zb.WeightedChanceMode(chances)
 
 		zb.RoundList[i] = round
