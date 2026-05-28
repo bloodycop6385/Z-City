@@ -392,20 +392,31 @@ local function IsSpectatorESPAllowed()
 	return true
 end
 
+local function GetSpectatorESPPulse(target, speed, offset)
+	local seed = IsValid(target) and target:EntIndex() * 0.37 or 0
+
+	return 0.5 + math.sin(CurTime() * speed + seed + (offset or 0)) * 0.5
+end
+
 local function GetSpectatorESPColor(ply)
 	if not IsValid(ply) then return spectatorESPDefaultColor end
 
 	local teamColor = team.GetColor(ply:Team())
+	local pulse = GetSpectatorESPPulse(ply, 2.8)
+	local alpha = 120 + pulse * 75
+
 	if teamColor and (teamColor.r ~= 255 or teamColor.g ~= 255 or teamColor.b ~= 255) then
-		return Color(teamColor.r, teamColor.g, teamColor.b, 255)
+		return Color(teamColor.r, teamColor.g, teamColor.b, alpha)
 	end
 
 	local playerColor = ply:GetPlayerColor()
 	if playerColor and playerColor ~= vector_origin then
-		return playerColor:ToColor()
+		local color = playerColor:ToColor()
+		color.a = alpha
+		return color
 	end
 
-	return spectatorESPDefaultColor
+	return Color(spectatorESPDefaultColor.r, spectatorESPDefaultColor.g, spectatorESPDefaultColor.b, alpha)
 end
 
 local function GetSpectatorESPEntity(ply)
