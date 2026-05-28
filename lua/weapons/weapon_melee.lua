@@ -159,17 +159,23 @@ if CLIENT then
 	function SWEP:GetWM()
         if IsValid(self.worldModel) then
             return self.worldModel
-        else
-            self.worldModel = ClientsideModel(self.WorldModel)
-            self.worldModel:SetNoDraw(true)
-            self.worldModel:SetupBones()
-            self:CallOnRemove("remove_worldmodel1",function()
-                if IsValid(model) then
-                    model:Remove()
-                    model = nil
-                end
-            end)
         end
+        if not self.WorldModel or self.WorldModel == "" then
+            return nil
+        end
+        self.worldModel = ClientsideModel(self.WorldModel)
+        if not IsValid(self.worldModel) then
+            self.worldModel = nil
+            return nil
+        end
+        self.worldModel:SetNoDraw(true)
+        self.worldModel:SetupBones()
+        self:CallOnRemove("remove_worldmodel1",function()
+            if IsValid(model) then
+                model:Remove()
+                model = nil
+            end
+        end)
 		return self.worldModel
 	end
 
@@ -224,7 +230,9 @@ if CLIENT then
         if not IsValid(self.worldModel) then
             self.worldModel = self:GetWM()
         end
-        
+
+        if not IsValid(self.worldModel) then return end
+
         self.worldModel:SetNoDraw(true)
         
         if IsValid(owner) and (not owner.shouldTransmit or owner.NotSeen) then return end
