@@ -97,6 +97,10 @@ function MODE:MakeHider(ply)
     zb.GiveRole(ply, "Hider", Color(0, 120, 190))
 end
 
+local function computeHuntDuration(hiderCount)
+    return math.Clamp(180 + hiderCount * 60, 180, MODE.HuntTime)
+end
+
 function MODE:RoundStart()
     self.HuntStarted = false
     self.HuntDeadline = nil
@@ -105,6 +109,7 @@ function MODE:RoundStart()
     if not IsValid(home) then return end
     self.Homelander = home
 
+    local hiderCount = 0
     for _, ply in player.Iterator() do
         if not ply:Alive() then continue end
         ply:SetSuppressPickupNotices(true)
@@ -118,6 +123,7 @@ function MODE:RoundStart()
                 ply:SetPlayerClass()
             end
             self:MakeHider(ply)
+            hiderCount = hiderCount + 1
         end
 
         timer.Simple(0.1, function()
@@ -126,7 +132,9 @@ function MODE:RoundStart()
         ply:SetSuppressPickupNotices(false)
     end
 
-    self.HuntDeadline = CurTime() + MODE.HideTime + MODE.HuntTime
+    self.CurrentHuntTime = computeHuntDuration(hiderCount)
+    SetGlobalFloat("TheBoysHuntTime", self.CurrentHuntTime)
+    self.HuntDeadline = CurTime() + MODE.HideTime + self.CurrentHuntTime
 end
 
 function MODE:GiveWeapons() end

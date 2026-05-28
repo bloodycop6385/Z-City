@@ -43,7 +43,7 @@ function MODE:HUDPaint()
 
     local isHomelander = ply.PlayerClassName == "homelander" or ply:GetNWBool("IsHomelander")
     local huntStart = (zb.ROUND_START or 0) + self.HideTime
-    local huntEnd = huntStart + self.HuntTime
+    local huntEnd = huntStart + GetGlobalFloat("TheBoysHuntTime", self.HuntTime)
 
     if CurTime() < huntStart then
         local left = huntStart - CurTime()
