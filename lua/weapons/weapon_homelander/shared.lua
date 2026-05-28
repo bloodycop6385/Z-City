@@ -45,7 +45,7 @@ TBOYS.PrecacheBaseAssets()
 
 SWEP.PrintName = "Homelander"
 SWEP.Author = "Zenius07"
-SWEP.Instructions = "LMB - Punch / Grab execute\nRMB - Heat vision / Laser execute\nR - Change mode\nDouble jump - Flight\nShift + Double jump - Dash flight\nG - Voice line\nH - X-Ray vision"
+SWEP.Instructions = "LMB - Punch / Grab execute\nRMB - Heat vision / Laser execute\nR - Change mode\nDouble jump - Flight\nShift + Double jump - Dash flight\nG - Voice line"
 SWEP.Category = "The Boys"
 
 SWEP.Spawnable = true
@@ -182,7 +182,6 @@ local HOMELANDER_GRAB_RAGDOLL_ANGLE_OFFSET = Angle(0, -90, 0)
 local HOMELANDER_GRAB_RAGDOLL_HEAD_ANGLE_OFFSET = Angle(0, 0, 0)
 local HOMELANDER_GRAB_RAGDOLL_BODY_OFFSET = Vector(0, 0, 0)
 local HOMELANDER_GRAB_RAGDOLL_CAMERA_OFFSET = Vector(0, 0, 3)
-local HOMELANDER_XRAY_RADIUS = 10000
 local FLYING_DAMAGE_CLASSES = {
     prop_physics = true,
     prop_physics_multiplayer = true,
@@ -2876,7 +2875,6 @@ HOMELANDER_SHARED.HOMELANDER_SUPER_PROP_DESTROY_RADIUS = HOMELANDER_SUPER_PROP_D
 HOMELANDER_SHARED.HOMELANDER_SUPER_PROP_SCATTER_FORCE = HOMELANDER_SUPER_PROP_SCATTER_FORCE
 HOMELANDER_SHARED.HOMELANDER_SUPER_PROP_SCATTER_RADIUS = HOMELANDER_SUPER_PROP_SCATTER_RADIUS
 HOMELANDER_SHARED.HOMELANDER_VEHICLE_CLASS_HINTS = HOMELANDER_VEHICLE_CLASS_HINTS
-HOMELANDER_SHARED.HOMELANDER_XRAY_RADIUS = HOMELANDER_XRAY_RADIUS
 HOMELANDER_SHARED.homelanderApplyGoreDismember = homelanderApplyGoreDismember
 HOMELANDER_SHARED.HomelanderGetEyePositions = HomelanderGetEyePositions
 HOMELANDER_SHARED.invalidateHomelanderBoneCache = invalidateHomelanderBoneCache

@@ -8,7 +8,6 @@ local HOMELANDER_GRAB_RAGDOLL_CAMERA_OFFSET = HOMELANDER_SHARED.HOMELANDER_GRAB_
 local HOMELANDER_MODE_NORMAL = HOMELANDER_SHARED.HOMELANDER_MODE_NORMAL
 local HOMELANDER_MODE_STRONG = HOMELANDER_SHARED.HOMELANDER_MODE_STRONG
 local HOMELANDER_MODE_GRAB = HOMELANDER_SHARED.HOMELANDER_MODE_GRAB
-local HOMELANDER_XRAY_RADIUS = HOMELANDER_SHARED.HOMELANDER_XRAY_RADIUS
 local HomelanderGetEyePositions = HOMELANDER_SHARED.HomelanderGetEyePositions
 local invalidateHomelanderBoneCache = HOMELANDER_SHARED.invalidateHomelanderBoneCache
 local debugHomelanderDismember = HOMELANDER_SHARED.debugHomelanderDismember or function() end
@@ -1148,61 +1147,6 @@ if CLIENT then
 
         return weapon
     end
-
-    local function toggleHomelanderXRay(weapon)
-        if not IsValid(weapon) then return end
-
-        weapon.HomelanderXRayEnabled = not weapon.HomelanderXRayEnabled
-        surface.PlaySound(weapon.HomelanderXRayEnabled and "items/nvg_on.wav" or "items/nvg_off.wav")
-    end
-
-    local xrayKeyWasDown = false
-    hook.Add("Think", "HomelanderSWEP_XRayToggle", function()
-        local keyDown = input.IsKeyDown(KEY_H)
-        if not keyDown then
-            xrayKeyWasDown = false
-            return
-        end
-        if xrayKeyWasDown then return end
-        xrayKeyWasDown = true
-
-        local ply = LocalPlayer()
-        local weapon = getHomelanderWeapon(ply)
-        if not IsValid(weapon) then return end
-        if vgui.GetKeyboardFocus() or gui.IsGameUIVisible() then return end
-
-        toggleHomelanderXRay(weapon)
-    end)
-
-    hook.Add("PreDrawHalos", "HomelanderSWEP_XRayHalos", function()
-        local ply = LocalPlayer()
-        local weapon = getHomelanderWeapon(ply)
-        if not IsValid(weapon) or not weapon.HomelanderXRayEnabled then return end
-
-        local origin = ply:WorldSpaceCenter()
-        local maxDistanceSqr = HOMELANDER_XRAY_RADIUS * HOMELANDER_XRAY_RADIUS
-        local targets = {}
-
-        for _, target in ipairs(player.GetAll()) do
-            if target == ply then continue end
-            if not IsValid(target) or not target:Alive() then continue end
-            if origin:DistToSqr(target:WorldSpaceCenter()) > maxDistanceSqr then continue end
-
-            targets[#targets + 1] = target
-        end
-
-        for _, target in ipairs(ents.FindInSphere(origin, HOMELANDER_XRAY_RADIUS)) do
-            if not IsValid(target) then continue end
-            if not (target:IsNPC() or (target.IsNextBot and target:IsNextBot())) then continue end
-            if target.Health and target:Health() <= 0 then continue end
-
-            targets[#targets + 1] = target
-        end
-
-        if #targets <= 0 then return end
-
-        halo.Add(targets, Color(255, 35, 25), 1, 1, 3, true, true)
-    end)
 
     local function traceLocalLaserRenderHit(ply, weapon)
         local startPos = ply:EyePos()
