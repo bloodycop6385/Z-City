@@ -438,45 +438,6 @@ local function ShouldDrawSpectatorESPFor(localPly, target)
 	return IsValid(GetSpectatorESPEntity(target))
 end
 
-local function GetSpectatorESPBox(ent)
-	if not IsValid(ent) then return end
-
-	local mins, maxs = ent:OBBMins(), ent:OBBMaxs()
-	local pos = ent:GetPos()
-	local ang = Angle(0, ent:GetAngles().y, 0)
-	local minX, minY = ScrW(), ScrH()
-	local maxX, maxY = 0, 0
-
-	local corners = {
-		Vector(mins.x, mins.y, mins.z),
-		Vector(mins.x, maxs.y, mins.z),
-		Vector(maxs.x, maxs.y, mins.z),
-		Vector(maxs.x, mins.y, mins.z),
-		Vector(mins.x, mins.y, maxs.z),
-		Vector(mins.x, maxs.y, maxs.z),
-		Vector(maxs.x, maxs.y, maxs.z),
-		Vector(maxs.x, mins.y, maxs.z)
-	}
-
-	for _, corner in ipairs(corners) do
-		local screen = LocalToWorld(corner, angle_zero, pos, ang):ToScreen()
-		if not screen.visible then return end
-
-		minX = math.min(minX, screen.x)
-		minY = math.min(minY, screen.y)
-		maxX = math.max(maxX, screen.x)
-		maxY = math.max(maxY, screen.y)
-	end
-
-	return minX, minY, maxX - minX, maxY - minY
-end
-
-local function GetSpectatorESPLabelPos(ent)
-	local maxs = ent:OBBMaxs()
-
-	return ent:GetPos() + Vector(0, 0, maxs.z + 14)
-end
-
 hook.Add("SetupOutlines", "ZB_SpectatorESP_Outlines", function(outline_Add)
 	if not IsSpectatorESPAllowed() then return end
 
