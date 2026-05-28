@@ -1,4 +1,4 @@
-ylocal MODE = MODE
+local MODE = MODE
 
 MODE.KillMoney = 1000
 MODE.StartMoney = 1000
@@ -21,10 +21,10 @@ function MODE:DontKillPlayer(ply)
 end
 
 function MODE:CanLaunch()
-	local points = zb.GetMapPoints( "HMCD_TDM_T" )
-	local points2 = zb.GetMapPoints( "HMCD_TDM_CT" )
-	local points3 = zb.GetMapPoints( "BOMB_ZONE_A" )
-	local points4 = zb.GetMapPoints( "BOMB_ZONE_B" )
+    local points = zb.GetMapPoints( "HMCD_TDM_T" )
+    local points2 = zb.GetMapPoints( "HMCD_TDM_CT" )
+    local points3 = zb.GetMapPoints( "BOMB_ZONE_A" )
+    local points4 = zb.GetMapPoints( "BOMB_ZONE_B" )
 
     local points5 = zb.GetMapPoints( "HOSTAGE_DELIVERY_ZONE" )
 
@@ -44,7 +44,7 @@ end
 
 
 function MODE:Intermission()
-	game.CleanUpMap()
+    game.CleanUpMap()
     
     zb.RoundsLeft = zb.RoundsLeft or self.Rounds
     zb.Winners = zb.Winners or {}
@@ -75,13 +75,13 @@ function MODE:Intermission()
     zb.SendSpecificPointsToPly(nil, "BOMB_ZONE_B", false)
     zb.SendSpecificPointsToPly(nil, "HOSTAGE_DELIVERY_ZONE", false)
 
-	self.CTPoints = {}
-	self.TPoints = {}
-	table.CopyFromTo( zb.GetMapPoints( "HMCD_TDM_T" ), self.TPoints)
-	table.CopyFromTo( zb.GetMapPoints( "HMCD_TDM_CT" ), self.CTPoints)
+    self.CTPoints = {}
+    self.TPoints = {}
+    table.CopyFromTo( zb.GetMapPoints( "HMCD_TDM_T" ), self.TPoints)
+    table.CopyFromTo( zb.GetMapPoints( "HMCD_TDM_CT" ), self.CTPoints)
 
-	for i, ply in player.Iterator() do
-		ply:SetupTeam(ply:Team())
+    for i, ply in player.Iterator() do
+        ply:SetupTeam(ply:Team())
         
         if self.GameStarted then
             ply:SetNWInt( "TDM_Money", self.StartMoney )
@@ -109,7 +109,7 @@ function MODE:Intermission()
             local ent = ents.Create("prop_ragdoll")
             local team_t = team.GetPlayers(0)
             local ply = team_t[math.random(#team_t)]
-			--ent:SetModel("models/humans/group01/"..(math.random(2) == 1 and "fe" or "").."male_0"..math.random(9)..".mdl")
+            --ent:SetModel("models/humans/group01/"..(math.random(2) == 1 and "fe" or "").."male_0"..math.random(9)..".mdl")
             ent:SetModel("models/player/hostage/hostage_0"..math.random(4)..".mdl")
             ent:SetPos(ply:GetPos())
             ent:Spawn()
@@ -128,7 +128,7 @@ function MODE:Intermission()
 
     PrintMessage(HUD_PRINTTALK, "Round "..(self.Rounds - zb.RoundsLeft).." out of "..self.Rounds..".")
 
-	net.Start("tdm_start")
+    net.Start("tdm_start")
         net.WriteString(zb.rtype or "bomb")
         net.Broadcast()
     
@@ -137,8 +137,8 @@ end
 
 concommand.Add("tdm_setrounds", function(ply, cmd, args)
     if not ply:IsAdmin() then return end--idiot
-	if not args[1] then return end
-	local oldRounds = MODE.Rounds
+    if not args[1] then return end
+    local oldRounds = MODE.Rounds
     local oldLeft = zb.RoundsLeft or oldRounds
     local played = oldRounds - oldLeft
     MODE.Rounds = math.max(tonumber(args[1]) or oldRounds, 1)
@@ -147,9 +147,9 @@ concommand.Add("tdm_setrounds", function(ply, cmd, args)
 end)
 
 COMMANDS.nextcsround = {
-	function(ply, args)
-		if not ply:IsAdmin() then ply:ChatPrint("You don't have access") return end
-		if string.lower(args[1]) == "bomb" then
+    function(ply, args)
+        if not ply:IsAdmin() then ply:ChatPrint("You don't have access") return end
+        if string.lower(args[1]) == "bomb" then
             zb.nextcsround = "bomb"
             PrintMessage(HUD_PRINTTALK, "Chosen CS round - Bomb")
         end
@@ -158,8 +158,8 @@ COMMANDS.nextcsround = {
             zb.nextcsround = "hostage"
             PrintMessage(HUD_PRINTTALK, "Chosen CS round - Hostage")
         end
-	end,
-	0
+    end,
+    0
 }
 
 
@@ -167,14 +167,14 @@ function MODE:EndRound()
     zb.RoundsLeft = zb.RoundsLeft or self.Rounds
     zb.Winners = zb.Winners or {}
 
-	timer.Simple(2,function()
-		net.Start("tdm_roundend")
-		net.Broadcast()
-	end)
+    timer.Simple(2,function()
+        net.Start("tdm_roundend")
+        net.Broadcast()
+    end)
 
     local winner = 3
 
-	local tbl = zb:CheckAliveTeams(true)
+    local tbl = zb:CheckAliveTeams(true)
 
     if zb.rtype == "bomb" then
         if not IsValid(zb.bomb) then
@@ -247,32 +247,32 @@ function MODE:EndRound()
     
     PrintMessage(HUD_PRINTTALK, winnerprt.." have won the round.")
 
-	for k,ply in player.Iterator() do
-		if ply:Team() == winner then
-			ply:GiveExp(math.random(15,30))
-			ply:GiveSkill(math.Rand(0.1,0.15))
+    for k,ply in player.Iterator() do
+        if ply:Team() == winner then
+            ply:GiveExp(math.random(15,30))
+            ply:GiveSkill(math.Rand(0.1,0.15))
 
             ply:SetNWInt( "TDM_Money", math.max(ply:GetNWInt( "TDM_Money" ) + 2500, 0) )
-		else
-			ply:GiveSkill(-math.Rand(0.05,0.1))
+        else
+            ply:GiveSkill(-math.Rand(0.05,0.1))
             
             ply:SetNWInt( "TDM_Money", math.max(ply:GetNWInt( "TDM_Money" ) + 1750, 0) )
-		end
-	end
+        end
+    end
 
-	local winsTeam0 = zb.Winners[0] or 0
-	local winsTeam1 = zb.Winners[1] or 0
-	if winsTeam0 > winsTeam1 then
-		for _, ply in ipairs(team.GetPlayers(1)) do
-			ply:SetNWInt("TDM_Money", math.max(ply:GetNWInt("TDM_Money") + 1000, 0))
-			ply:ChatPrint("You have received a compensation of 1000 money because your team is losing.")
-		end
-	elseif winsTeam1 > winsTeam0 then
-		for _, ply in ipairs(team.GetPlayers(0)) do
-			ply:SetNWInt("TDM_Money", math.max(ply:GetNWInt("TDM_Money") + 1000, 0))
-			ply:ChatPrint("You have received a compensation of 1000 money because your team is losing.")
-		end
-	end
+    local winsTeam0 = zb.Winners[0] or 0
+    local winsTeam1 = zb.Winners[1] or 0
+    if winsTeam0 > winsTeam1 then
+        for _, ply in ipairs(team.GetPlayers(1)) do
+            ply:SetNWInt("TDM_Money", math.max(ply:GetNWInt("TDM_Money") + 1000, 0))
+            ply:ChatPrint("You have received a compensation of 1000 money because your team is losing.")
+        end
+    elseif winsTeam1 > winsTeam0 then
+        for _, ply in ipairs(team.GetPlayers(0)) do
+            ply:SetNWInt("TDM_Money", math.max(ply:GetNWInt("TDM_Money") + 1000, 0))
+            ply:ChatPrint("You have received a compensation of 1000 money because your team is losing.")
+        end
+    end
 
     
     if zb.nextround != self.name then
@@ -311,34 +311,34 @@ function MODE:EndRound()
 end
 
 function HostageInZone(pos)
-	local pts = zb.hostagepoints
+    local pts = zb.hostagepoints
 
-	local vec1
-	local vec2
-	local vec3
-	local vec4
+    local vec1
+    local vec2
+    local vec3
+    local vec4
 
-	if #pts >= 2 then
-		vec1 = -(-pts[1].pos)
-		vec1[3] = vec1[3] - 256
-		vec2 = -(-pts[2].pos)
-		vec2[3] = vec2[3] + 256
-	end
+    if #pts >= 2 then
+        vec1 = -(-pts[1].pos)
+        vec1[3] = vec1[3] - 256
+        vec2 = -(-pts[2].pos)
+        vec2[3] = vec2[3] + 256
+    end
 
     if #pts >= 4 then
         vec3 = -(-pts[3].pos)
-		vec3[3] = vec3[3] - 256
-		vec4 = -(-pts[4].pos)
-		vec4[3] = vec4[3] + 256
+        vec3[3] = vec3[3] - 256
+        vec4 = -(-pts[4].pos)
+        vec4[3] = vec4[3] + 256
     end
     
-	return (#pts >= 2 and pos:WithinAABox(vec1,vec2)) or (#pts >= 4 and pos:WithinAABox(vec3,vec4))
+    return (#pts >= 2 and pos:WithinAABox(vec1,vec2)) or (#pts >= 4 and pos:WithinAABox(vec3,vec4))
 end
 
 function MODE:ShouldRoundEnd()
     if zb.ROUND_START + 5 > CurTime() then return false end
 
-	local tbl = zb:CheckAliveTeams(true)
+    local tbl = zb:CheckAliveTeams(true)
     
     if zb.rtype == "bomb" then
         if zb.bombexploded then
