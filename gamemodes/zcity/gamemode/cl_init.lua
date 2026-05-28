@@ -445,39 +445,31 @@ hook.Add("SetupOutlines", "ZB_SpectatorESP_Outlines", function(outline_Add)
 	for _, target in player.Iterator() do
 		if not ShouldDrawSpectatorESPFor(ply, target) then continue end
 
-		outline_Add(GetSpectatorESPEntity(target), GetSpectatorESPColor(target), OUTLINE_MODE_BOTH)
+		outline_Add(GetSpectatorESPEntity(target), GetSpectatorESPColor(target), OUTLINE_MODE_NOTVISIBLE)
 	end
 end)
 
-hook.Add("HUDPaint", "ZB_SpectatorESP_HUD", function()
+hook.Add("PostDrawTranslucentRenderables", "ZB_SpectatorESP_Flair", function()
 	if not IsSpectatorESPAllowed() then return end
+	if spectatorESPFlair and not spectatorESPFlair:GetBool() then return end
 
 	local ply = LocalPlayer()
-	local origin = EyePos()
+	render.SetMaterial(spectatorESPRingMaterial)
 
 	for _, target in player.Iterator() do
 		if not ShouldDrawSpectatorESPFor(ply, target) then continue end
 
 		local ent = GetSpectatorESPEntity(target)
+		local center = ent:WorldSpaceCenter()
+		local pulse = GetSpectatorESPPulse(target, 2.1, 1.6)
 		local col = GetSpectatorESPColor(target)
-		local x, y, w, h = GetSpectatorESPBox(ent)
+		local ringColor = Color(col.r, col.g, col.b, 18 + pulse * 26)
+		local glintColor = Color(col.r, col.g, col.b, 45 + pulse * 45)
 
-		if x then
-			surface.SetDrawColor(spectatorESPBoxOutline)
-			surface.DrawOutlinedRect(x - 1, y - 1, w + 2, h + 2, 1)
-			surface.DrawOutlinedRect(x + 1, y + 1, math.max(w - 2, 1), math.max(h - 2, 1), 1)
-
-			surface.SetDrawColor(col)
-			surface.DrawOutlinedRect(x, y, w, h, 2)
-		end
-
-		local entCenter = ent:WorldSpaceCenter()
-		local screen = GetSpectatorESPLabelPos(ent):ToScreen()
-		if not screen.visible then continue end
-
-		local distance = math.floor(origin:Distance(entCenter) / 52.49)
-		draw.SimpleTextOutlined(target:Nick(), "TargetIDSmall", screen.x, screen.y - 10, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black)
-		draw.SimpleTextOutlined(distance .. " m", "TargetIDSmall", screen.x, screen.y + 5, spectatorESPTextColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black)
+		cam.IgnoreZ(true)
+			render.DrawQuadEasy(ent:GetPos() + spectatorESPFeetLift, spectatorESPVectorUp, 34 + pulse * 20, 34 + pulse * 20, ringColor, CurTime() * 35)
+			render.DrawSprite(center, 8 + pulse * 5, 8 + pulse * 5, glintColor)
+		cam.IgnoreZ(false)
 	end
 end)
 
