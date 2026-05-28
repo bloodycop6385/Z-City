@@ -134,7 +134,8 @@ function SWEP:Blur(x,y,w,z)
 end
 
 hook.Add("HUDPaint","drawWeaponHUD",function()
-	if lply:Alive() then return end
+	local lply = LocalPlayer()
+	if not IsValid(lply) or lply:Alive() then return end
 	local ply = lply:GetNWEntity("spect", lply)
 	if not IsValid(ply) or not ply:IsPlayer() or viewmode != 1 or ply == lply then return end
 	local wep = ply:GetActiveWeapon()

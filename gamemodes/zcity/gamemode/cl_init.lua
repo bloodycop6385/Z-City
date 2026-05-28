@@ -374,10 +374,12 @@ surface.CreateFont("ZB_InterfaceHumongous", {
 
 local spectatorESPEnabled = ConVarExists("zb_spectator_esp") and GetConVar("zb_spectator_esp") or CreateClientConVar("zb_spectator_esp", "1", true, false, "Show player ESP while dead or spectating", 0, 1)
 local spectatorESPFlair = ConVarExists("zb_spectator_esp_flair") and GetConVar("zb_spectator_esp_flair") or CreateClientConVar("zb_spectator_esp_flair", "1", true, false, "Show subtle spectator ESP visual effects", 0, 1)
+local spectatorESPNames = ConVarExists("zb_spectator_esp_names") and GetConVar("zb_spectator_esp_names") or CreateClientConVar("zb_spectator_esp_names", "1", true, false, "Show names in spectator ESP", 0, 1)
 local spectatorESPDefaultColor = Color(255, 120, 80, 170)
 local spectatorESPRingMaterial = Material("sprites/glow04_noz")
 local spectatorESPVectorUp = Vector(0, 0, 1)
 local spectatorESPFeetLift = Vector(0, 0, 2)
+local spectatorESPNameLift = Vector(0, 0, 14)
 
 local function IsSpectatorESPAllowed()
 	if spectatorESPEnabled and not spectatorESPEnabled:GetBool() then return false end
@@ -402,8 +404,7 @@ local function GetSpectatorESPColor(ply)
 	if not IsValid(ply) then return spectatorESPDefaultColor end
 
 	local teamColor = team.GetColor(ply:Team())
-	local pulse = GetSpectatorESPPulse(ply, 2.8)
-	local alpha = 120 + pulse * 75
+	local alpha = 185
 
 	if teamColor and (teamColor.r ~= 255 or teamColor.g ~= 255 or teamColor.b ~= 255) then
 		return Color(teamColor.r, teamColor.g, teamColor.b, alpha)
@@ -438,6 +439,30 @@ local function ShouldDrawSpectatorESPFor(localPly, target)
 	return IsValid(GetSpectatorESPEntity(target))
 end
 
+local function GetSpectatorESPNamePos(ent)
+	if not IsValid(ent) then return vector_origin end
+
+	local bone = ent.LookupBone and (ent:LookupBone("ValveBiped.Bip01_Head1") or ent:LookupBone("ValveBiped.Bip01_Spine2"))
+	if bone then
+		local matrix = ent:GetBoneMatrix(bone)
+		if matrix then return matrix:GetTranslation() + spectatorESPNameLift end
+	end
+
+	local maxs = ent:OBBMaxs()
+
+	return ent:GetPos() + Vector(0, 0, maxs.z + 14)
+end
+
+local function GetSpectatorESPName(target)
+	local name = target:Nick() or "Unknown"
+
+	if #name > 28 then
+		name = string.sub(name, 1, 25) .. "..."
+	end
+
+	return name
+end
+
 hook.Add("SetupOutlines", "ZB_SpectatorESP_Outlines", function(outline_Add)
 	if not IsSpectatorESPAllowed() then return end
 
@@ -445,7 +470,7 @@ hook.Add("SetupOutlines", "ZB_SpectatorESP_Outlines", function(outline_Add)
 	for _, target in player.Iterator() do
 		if not ShouldDrawSpectatorESPFor(ply, target) then continue end
 
-		outline_Add(GetSpectatorESPEntity(target), GetSpectatorESPColor(target), OUTLINE_MODE_NOTVISIBLE)
+		outline_Add(GetSpectatorESPEntity(target), GetSpectatorESPColor(target), OUTLINE_MODE_BOTH)
 	end
 end)
 
@@ -454,6 +479,10 @@ hook.Add("PostDrawTranslucentRenderables", "ZB_SpectatorESP_Flair", function()
 	if spectatorESPFlair and not spectatorESPFlair:GetBool() then return end
 
 	local ply = LocalPlayer()
+	local nameAngle = EyeAngles()
+	nameAngle:RotateAroundAxis(nameAngle:Forward(), 90)
+	nameAngle:RotateAroundAxis(nameAngle:Right(), 90)
+
 	render.SetMaterial(spectatorESPRingMaterial)
 
 	for _, target in player.Iterator() do
@@ -469,6 +498,23 @@ hook.Add("PostDrawTranslucentRenderables", "ZB_SpectatorESP_Flair", function()
 		cam.IgnoreZ(true)
 			render.DrawQuadEasy(ent:GetPos() + spectatorESPFeetLift, spectatorESPVectorUp, 34 + pulse * 20, 34 + pulse * 20, ringColor, CurTime() * 35)
 			render.DrawSprite(center, 8 + pulse * 5, 8 + pulse * 5, glintColor)
+
+			if not spectatorESPNames or spectatorESPNames:GetBool() then
+				local name = GetSpectatorESPName(target)
+				local namePos = GetSpectatorESPNamePos(ent)
+
+				cam.Start3D2D(namePos, nameAngle, 0.08)
+					surface.SetFont("ZB_InterfaceSmall")
+					local textW, textH = surface.GetTextSize(name)
+
+					surface.SetDrawColor(0, 0, 0, 145)
+					surface.DrawRect(-textW * 0.5 - 8, -textH * 0.5 - 4, textW + 16, textH + 8)
+					surface.SetDrawColor(col.r, col.g, col.b, 210)
+					surface.DrawRect(-textW * 0.5 - 8, -textH * 0.5 - 4, 3, textH + 8)
+
+					draw.SimpleText(name, "ZB_InterfaceSmall", 0, 0, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				cam.End3D2D()
+			end
 		cam.IgnoreZ(false)
 	end
 end)
