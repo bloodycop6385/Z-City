@@ -372,6 +372,141 @@ surface.CreateFont("ZB_InterfaceHumongous", {
     antialias = true
 })
 
+local spectatorESPEnabled = ConVarExists("zb_spectator_esp") and GetConVar("zb_spectator_esp") or CreateClientConVar("zb_spectator_esp", "1", true, false, "Show player ESP while dead or spectating", 0, 1)
+local spectatorESPDefaultColor = Color(255, 80, 80)
+local spectatorESPTextColor = Color(235, 235, 235)
+local spectatorESPBoxOutline = Color(0, 0, 0, 210)
+
+local function IsSpectatorESPAllowed()
+	if spectatorESPEnabled and not spectatorESPEnabled:GetBool() then return false end
+
+	local ply = LocalPlayer()
+	if not IsValid(ply) then return false end
+	if ply:Alive() and ply:Team() ~= TEAM_SPECTATOR then return false end
+
+	local round = CurrentRound and CurrentRound()
+	if not round or round.name == "coop" then return false end
+
+	return true
+end
+
+local function GetSpectatorESPColor(ply)
+	if not IsValid(ply) then return spectatorESPDefaultColor end
+
+	local teamColor = team.GetColor(ply:Team())
+	if teamColor and (teamColor.r ~= 255 or teamColor.g ~= 255 or teamColor.b ~= 255) then
+		return Color(teamColor.r, teamColor.g, teamColor.b, 255)
+	end
+
+	local playerColor = ply:GetPlayerColor()
+	if playerColor and playerColor ~= vector_origin then
+		return playerColor:ToColor()
+	end
+
+	return spectatorESPDefaultColor
+end
+
+local function GetSpectatorESPEntity(ply)
+	if not IsValid(ply) then return NULL end
+
+	local ent = hg.GetCurrentCharacter and hg.GetCurrentCharacter(ply) or ply
+	return IsValid(ent) and ent or ply
+end
+
+local function ShouldDrawSpectatorESPFor(localPly, target)
+	if not IsValid(target) or target == localPly then return false end
+	if target:Team() == TEAM_SPECTATOR then return false end
+	if not target:Alive() then return false end
+
+	if localPly:GetNWInt("viewmode", 0) == 1 and localPly:GetNWEntity("spect") == target then
+		return false
+	end
+
+	return IsValid(GetSpectatorESPEntity(target))
+end
+
+local function GetSpectatorESPBox(ent)
+	if not IsValid(ent) then return end
+
+	local mins, maxs = ent:OBBMins(), ent:OBBMaxs()
+	local pos = ent:GetPos()
+	local ang = Angle(0, ent:GetAngles().y, 0)
+	local minX, minY = ScrW(), ScrH()
+	local maxX, maxY = 0, 0
+
+	local corners = {
+		Vector(mins.x, mins.y, mins.z),
+		Vector(mins.x, maxs.y, mins.z),
+		Vector(maxs.x, maxs.y, mins.z),
+		Vector(maxs.x, mins.y, mins.z),
+		Vector(mins.x, mins.y, maxs.z),
+		Vector(mins.x, maxs.y, maxs.z),
+		Vector(maxs.x, maxs.y, maxs.z),
+		Vector(maxs.x, mins.y, maxs.z)
+	}
+
+	for _, corner in ipairs(corners) do
+		local screen = LocalToWorld(corner, angle_zero, pos, ang):ToScreen()
+		if not screen.visible then return end
+
+		minX = math.min(minX, screen.x)
+		minY = math.min(minY, screen.y)
+		maxX = math.max(maxX, screen.x)
+		maxY = math.max(maxY, screen.y)
+	end
+
+	return minX, minY, maxX - minX, maxY - minY
+end
+
+local function GetSpectatorESPLabelPos(ent)
+	local maxs = ent:OBBMaxs()
+
+	return ent:GetPos() + Vector(0, 0, maxs.z + 14)
+end
+
+hook.Add("SetupOutlines", "ZB_SpectatorESP_Outlines", function(outline_Add)
+	if not IsSpectatorESPAllowed() then return end
+
+	local ply = LocalPlayer()
+	for _, target in player.Iterator() do
+		if not ShouldDrawSpectatorESPFor(ply, target) then continue end
+
+		outline_Add(GetSpectatorESPEntity(target), GetSpectatorESPColor(target), OUTLINE_MODE_BOTH)
+	end
+end)
+
+hook.Add("HUDPaint", "ZB_SpectatorESP_HUD", function()
+	if not IsSpectatorESPAllowed() then return end
+
+	local ply = LocalPlayer()
+	local origin = EyePos()
+
+	for _, target in player.Iterator() do
+		if not ShouldDrawSpectatorESPFor(ply, target) then continue end
+
+		local ent = GetSpectatorESPEntity(target)
+		local col = GetSpectatorESPColor(target)
+		local x, y, w, h = GetSpectatorESPBox(ent)
+
+		if x then
+			surface.SetDrawColor(spectatorESPBoxOutline)
+			surface.DrawOutlinedRect(x - 1, y - 1, w + 2, h + 2, 1)
+			surface.DrawOutlinedRect(x + 1, y + 1, math.max(w - 2, 1), math.max(h - 2, 1), 1)
+
+			surface.SetDrawColor(col)
+			surface.DrawOutlinedRect(x, y, w, h, 2)
+		end
+
+		local entCenter = ent:WorldSpaceCenter()
+		local screen = GetSpectatorESPLabelPos(ent):ToScreen()
+		if not screen.visible then continue end
+
+		local distance = math.floor(origin:Distance(entCenter) / 52.49)
+		draw.SimpleTextOutlined(target:Nick(), "TargetIDSmall", screen.x, screen.y - 10, col, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black)
+		draw.SimpleTextOutlined(distance .. " m", "TargetIDSmall", screen.x, screen.y + 5, spectatorESPTextColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, color_black)
+	end
+end)
+
 hg.playerInfo = hg.playerInfo or {}
 
 local function addToPlayerInfo(ply, muted, volume)
