@@ -373,9 +373,11 @@ surface.CreateFont("ZB_InterfaceHumongous", {
 })
 
 local spectatorESPEnabled = ConVarExists("zb_spectator_esp") and GetConVar("zb_spectator_esp") or CreateClientConVar("zb_spectator_esp", "1", true, false, "Show player ESP while dead or spectating", 0, 1)
-local spectatorESPDefaultColor = Color(255, 80, 80)
-local spectatorESPTextColor = Color(235, 235, 235)
-local spectatorESPBoxOutline = Color(0, 0, 0, 210)
+local spectatorESPFlair = ConVarExists("zb_spectator_esp_flair") and GetConVar("zb_spectator_esp_flair") or CreateClientConVar("zb_spectator_esp_flair", "1", true, false, "Show subtle spectator ESP visual effects", 0, 1)
+local spectatorESPDefaultColor = Color(255, 120, 80, 170)
+local spectatorESPRingMaterial = Material("sprites/glow04_noz")
+local spectatorESPVectorUp = Vector(0, 0, 1)
+local spectatorESPFeetLift = Vector(0, 0, 2)
 
 local function IsSpectatorESPAllowed()
 	if spectatorESPEnabled and not spectatorESPEnabled:GetBool() then return false end
